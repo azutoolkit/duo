@@ -1,0 +1,9 @@
+name: duo
+version: 0.1.0
+
+authors:
+  - Elias J. Perez <eliasjpr@gmail.com>
+
+crystal: 0.36.0
+
+license: MIT
