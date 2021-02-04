@@ -20,9 +20,4 @@ module Duo
   DEFAULT_MAX_FRAME_SIZE      = MINIMUM_FRAME_SIZE
   REQUEST_PSEUDO_HEADERS      = %w(:method :scheme :authority :path)
   RESPONSE_PSEUDO_HEADERS     = %w(:status)
-
-  DEFAULT_SETTINGS = Settings.new(
-    max_concurrent_streams: 100,
-    max_header_list_size: 16384,
-  )
 end

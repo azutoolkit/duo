@@ -12,39 +12,21 @@ module Duo
       SERVER
     end
 
-    # ACK frame flag == END_STREAM...
+    private getter io : IO
     private ACK = Frame::Flags::END_STREAM
-
-    # Local settings. You may tune local settings prior to establishing the
-    # connection (prior to `#write_settings`) or later on, in which case you
-    # must call `#send_settings` to report changes to the remote peer.
-    getter local_settings : Settings
-
-    # Settings of remote peer. Updated whenever a SETTINGS frame is received.
-    getter remote_settings : Settings
-
+    getter local_settings : Settings = Settings::DEFAULT.dup
+    getter remote_settings : Settings = Settings.new
     protected getter hpack_encoder : HPACK::Encoder
     protected getter hpack_decoder : HPACK::Decoder
-    private getter io : IO
+
+    @channel = Channel(Frame | Array(Frame) | Nil).new(10)
+    @closed = false
+    @hpack_encoder = HPack.encoder
+    @hpack_decoder = HPack.decoder
+    @inbound_window_size = DEFAULT_INITIAL_WINDOW_SIZE
+    @outbound_window_size = Atomic(Int32).new(DEFAULT_INITIAL_WINDOW_SIZE)
 
     def initialize(@io : IO, @type : Type)
-      @local_settings = DEFAULT_SETTINGS.dup
-      @remote_settings = Settings.new
-      @channel = Channel(Frame | Array(Frame) | Nil).new(10)
-      @closed = false
-
-      @hpack_encoder = HPACK::Encoder.new(
-        max_table_size: local_settings.header_table_size,
-        indexing: HPACK::Indexing::NONE,
-        huffman: true
-      )
-      @hpack_decoder = HPACK::Decoder.new(
-        max_table_size: remote_settings.header_table_size
-      )
-
-      @inbound_window_size = DEFAULT_INITIAL_WINDOW_SIZE
-      @outbound_window_size = Atomic(Int32).new(DEFAULT_INITIAL_WINDOW_SIZE)
-
       spawn frame_writer
     end
 
@@ -382,9 +364,9 @@ module Duo
 
       remote_settings.parse(io, frame.size // 6) do |id, value|
         case id
-        when Settings::Identifier::HEADER_TABLE_SIZE
+        when Settings::Identifier::HeaderTableSize
           hpack_decoder.max_table_size = value
-        when Settings::Identifier::INITIAL_WINDOW_SIZE
+        when Settings::Identifier::InitialWindowSize
           difference = value - remote_settings.initial_window_size
 
           # adjust windows size for all control-flow streams (doesn't affect

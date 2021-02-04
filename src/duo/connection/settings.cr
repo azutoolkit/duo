@@ -2,100 +2,100 @@ require "./errors"
 
 module Duo
   class Settings
-    # See https://tools.ietf.org/html/rfc7540#section-11.3
+    MAX_CONCURRENT_STREAMS =   100
+    MAX_HEADER_LIST_SIZE   = 16384
+
+    DEFAULT = new(
+      max_concurrent_streams: MAX_CONCURRENT_STREAMS,
+      max_header_list_size: MAX_HEADER_LIST_SIZE,
+    )
+
     enum Identifier : UInt16
-      HEADER_TABLE_SIZE      = 0x1
-      ENABLE_PUSH            = 0x2
-      MAX_CONCURRENT_STREAMS = 0x3
-      INITIAL_WINDOW_SIZE    = 0x4
-      MAX_FRAME_SIZE         = 0x5
-      MAX_HEADER_LIST_SIZE   = 0x6
+      HeaderTableSize      = 0x1
+      EnablePush           = 0x2
+      MaxConcurrentStreams = 0x3
+      InitialWindowSize    = 0x4
+      MaxFrameSize         = 0x5
+      MaxHeaderListSize    = 0x6
+
+      def self.parse(io : IO, size : Int32, settings) : Nil
+        size.times do |_|
+          id = from_value?(io.read_bytes(UInt16, IO::ByteFormat::BigEndian))
+          value = io.read_bytes(UInt32, IO::ByteFormat::BigEndian).to_i32
+          next unless id # unknown setting identifier
+
+          yield id, value
+
+          case id
+          when HeaderTableSize      then settings.header_table_size = value
+          when EnablePush           then settings.enable_push = value
+          when MaxConcurrentStreams then settings.max_concurrent_streams = value
+          when InitialWindowSize    then settings.initial_window_size = value
+          when MaxFrameSize         then settings.max_frame_size = value
+          when MaxHeaderListSize    then settings.max_header_list_size = value
+          end
+        end
+      end
     end
 
-    setter header_table_size : Int32
-    setter enable_push : Bool
-    setter max_concurrent_streams : Int32
-    getter max_concurrent_streams : Int32?
-    setter initial_window_size : Int32
-    setter max_header_list_size : Int32
-    getter max_header_list_size : Int32?
-
-    @header_table_size : Int32?
-    @enable_push : Bool?
-    @max_concurrent_streams : Int32?
-    @initial_window_size : Int32?
-    @max_frame_size : Int32?
-    @max_header_list_size : Int32?
+    getter header_table_size : Int32
+    getter enable_push : Bool
+    getter max_concurrent_streams : Int32
+    getter max_concurrent_streams : Int32
+    getter initial_window_size : Int32
+    getter max_header_list_size : Int32
+    getter max_frame_size : Int32
 
     # :nodoc:
     protected def initialize(
-      @header_table_size = nil,
-      @enable_push = nil,
-      @max_concurrent_streams = nil,
-      @initial_window_size = nil,
-      @max_frame_size = nil,
-      @max_header_list_size = nil
+      @header_table_size : Int32 = DEFAULT_HEADER_TABLE_SIZE,
+      @enable_push : Bool = DEFAULT_ENABLE_PUSH,
+      @max_concurrent_streams : Int32 = MAX_CONCURRENT_STREAMS,
+      @initial_window_size : Int32 = DEFAULT_INITIAL_WINDOW_SIZE,
+      @max_frame_size : Int32 = DEFAULT_MAX_FRAME_SIZE,
+      @max_header_list_size : Int32 = MAX_HEADER_LIST_SIZE
     )
     end
 
-    def header_table_size : Int32
-      @header_table_size || DEFAULT_HEADER_TABLE_SIZE
-    end
-
-    def enable_push : Bool
-      @enable_push || DEFAULT_ENABLE_PUSH
-    end
-
-    def initial_window_size : Int32
-      @initial_window_size || DEFAULT_INITIAL_WINDOW_SIZE
-    end
-
-    def initial_window_size=(size : Int32)
-      raise Error.flow_control_error unless 0 <= size < MAXIMUM_WINDOW_SIZE
-      @initial_window_size = size
-    end
-
-    def max_frame_size : Int32
-      @max_frame_size || DEFAULT_MAX_FRAME_SIZE
-    end
-
-    def max_frame_size=(size : Int32)
-      unless MINIMUM_FRAME_SIZE <= size < MAXIMUM_FRAME_SIZE
-        raise Error.protocol_error("INVALID frame size: #{size}")
-      end
-      @max_frame_size = size
-    end
-
     def parse(bytes : Bytes) : Nil
-      parse(IO::Memory.new(bytes), bytes.size // 6) do |id, value|
-        yield id, value
+      Identifier.parse(IO::Memory.new(bytes), bytes.size // 6, self) do |identifier, value|
+        yield identifier, value
       end
     end
 
     def parse(io : IO, size : Int32) : Nil
-      size.times do |i|
-        id = Identifier.from_value?(io.read_bytes(UInt16, IO::ByteFormat::BigEndian))
-        value = io.read_bytes(UInt32, IO::ByteFormat::BigEndian).to_i32
-        next unless id # unknown setting identifier
-
-        yield id, value
-
-        case id
-        when Identifier::HEADER_TABLE_SIZE
-          self.header_table_size = value
-        when Identifier::ENABLE_PUSH
-          raise Error.protocol_error unless value == 0 || value == 1
-          self.enable_push = value == 1
-        when Identifier::MAX_CONCURRENT_STREAMS
-          self.max_concurrent_streams = value
-        when Identifier::INITIAL_WINDOW_SIZE
-          self.initial_window_size = value
-        when Identifier::MAX_FRAME_SIZE
-          self.max_frame_size = value
-        when Identifier::MAX_HEADER_LIST_SIZE
-          self.max_header_list_size = value
-        end
+      Identifier.parse(io, size, self) do |identifier, value|
+        yield identifier, value
       end
+    end
+
+    def max_header_list_size=(value : Int32)
+      @max_header_list_size = value
+    end
+
+    def max_frame_size=(value : Int32)
+      unless MINIMUM_FRAME_SIZE <= value < MAXIMUM_FRAME_SIZE
+        raise Error.protocol_error("INVALID frame size: #{value}")
+      end
+      @max_frame_size = value
+    end
+
+    def initial_window_size=(value : Int32)
+      raise Error.flow_control_error unless 0 <= value < MAXIMUM_WINDOW_SIZE
+      @initial_window_size = value
+    end
+
+    def max_concurrent_streams=(value : Int32)
+      @max_concurrent_streams = value
+    end
+
+    def header_table_size=(value : Int32)
+      @header_table_size = value
+    end
+
+    def enable_push=(value)
+      raise Error.protocol_error unless value == 0 || value == 1
+      @enable_push = (value == 1)
     end
 
     def to_payload : Bytes
