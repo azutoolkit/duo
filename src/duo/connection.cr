@@ -85,8 +85,6 @@ module Duo
           end
         rescue Channel::ClosedError
           break
-        rescue ex
-          Log.error(exception: ex) { }
         end
       end
     end
@@ -205,8 +203,6 @@ module Duo
       stream = streams.find(stream_id, consume: !frame_type.priority?)
       frame = Frame.new(frame_type, stream, flags, size: size)
 
-      Log.debug { "recv #{frame.debug(color: :light_cyan)}" }
-
       frame
     end
 
@@ -240,7 +236,6 @@ module Duo
           raise Error.protocol_error("INVALID stream dependency") if stream.id == dep_stream_id
           weight = read_byte.to_i32 + 1
           stream.priority = Priority.new(exclusive == 1, dep_stream_id, weight)
-          Log.debug { "  #{stream.priority.debug}" }
           size -= 5
         end
 
@@ -262,7 +257,6 @@ module Duo
             end
           end
         rescue ex : HPACK::Error
-          Log.debug { "HPACK::Error: #{ex.message}" }
           raise Error.compression_error
         end
 
@@ -375,14 +369,11 @@ module Duo
 
       weight = 1 + read_byte
       stream.priority = Priority.new(exclusive == 1, dep_stream_id, weight)
-
-      Log.debug { "  #{stream.priority.debug}" }
     end
 
     private def read_rst_stream_frame(frame)
       raise Error.frame_size_error unless frame.size == RST_STREAM_FRAME_SIZE
       error_code = Error::Code.new(io.read_bytes(UInt32, IO::ByteFormat::BigEndian))
-      Log.debug { "  code=#{error_code.to_s}" }
     end
 
     private def read_settings_frame(frame)
@@ -390,8 +381,6 @@ module Duo
       return if frame.flags.ack?
 
       remote_settings.parse(io, frame.size // 6) do |id, value|
-        Log.debug { "  #{id}=#{value}" }
-
         case id
         when Settings::Identifier::HEADER_TABLE_SIZE
           hpack_decoder.max_table_size = value
@@ -438,7 +427,6 @@ module Duo
       error_message = String.new(buffer)
 
       close(notify: false)
-      Log.debug { "  code=#{error_code.to_s}" }
 
       unless error_code == Error::Code::NO_ERROR
         raise ClientError.new(error_code, last_stream_id, error_message)
@@ -453,9 +441,6 @@ module Duo
       # reserved = buf.bit(31)
       window_size_increment = (buf & 0x7fffffff_u32).to_i32
       raise Error.protocol_error unless MINIMUM_WINDOW_SIZE <= window_size_increment <= MAXIMUM_WINDOW_SIZE
-
-      Log.debug { "  WINDOW_SIZE_INCREMENT=#{window_size_increment}" }
-
       if stream.id == 0
         increment_outbound_window_size(window_size_increment)
       else
@@ -499,7 +484,6 @@ module Duo
       size = frame.payload?.try(&.size.to_u32) || 0_u32
       stream = frame.stream
 
-      Log.debug { "send #{frame.debug(color: :light_magenta)}" }
       stream.sending(frame) unless frame.type == Frame::Type::PUSH_PROMISE
 
       io.write_bytes((size << 8) | frame.type.to_u8, IO::ByteFormat::BigEndian)

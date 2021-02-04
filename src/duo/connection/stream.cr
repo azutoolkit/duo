@@ -363,7 +363,6 @@ module Duo
     end
 
     private def state=(@state)
-      Log.debug { "; Stream is now #{state}" }
     end
 
     # :nodoc:

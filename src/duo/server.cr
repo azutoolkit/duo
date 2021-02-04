@@ -150,7 +150,6 @@ module Duo
       if settings
         # HTTP/1 => HTTP/2 upgrade: we got settings
         connection.remote_settings.parse(settings) do |setting, value|
-          Log.debug { "  #{setting}=#{value}" }
         end
       end
 
@@ -194,7 +193,6 @@ module Duo
       if connection
         connection.close(error: ex) unless connection.closed?
       end
-      Log.debug { "SENT: #{ex.code}: #{ex.message}" }
     ensure
       if connection
         connection.close unless connection.closed?

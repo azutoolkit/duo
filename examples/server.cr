@@ -5,29 +5,8 @@ class EchoHandler
 
   def call(context : Duo::Server::Context)
     request, response = context.request, context.response
-
-    if request.method == "PUT" && request.path == "/echo"
-      response.headers["server"] = "h2/0.0.0"
-
-      if len = request.content_length
-        response.headers["content-length"] = len.to_s
-      end
-      if type = request.headers["content-type"]?
-        response.headers["content-type"] = type
-      end
-
-      buffer = Bytes.new(8192)
-
-      loop do
-        count = request.body.read(buffer)
-        break if count == 0
-        response.write(buffer[0, count])
-      end
-
-      return
-    end
-
-    call_next(context)
+    context.response << "Hello World!"
+    context
   end
 end
 
