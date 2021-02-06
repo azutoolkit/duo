@@ -10,8 +10,8 @@ module Duo
 
     def active?
       self == Open ||
-      self == HalfClosedLocal ||
-      self == HalfClosedRemote
+        self == HalfClosedLocal ||
+        self == HalfClosedRemote
     end
 
     # :nodoc:

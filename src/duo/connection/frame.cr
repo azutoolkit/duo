@@ -2,24 +2,24 @@ module Duo
   class Frame
     # See https://tools.ietf.org/html/rfc7540#section-11.2
     enum Type
-      Data          = 0x0
-      Headers       = 0x1
-      Priority      = 0x2
+      Data         = 0x0
+      Headers      = 0x1
+      Priority     = 0x2
       RstStream    = 0x3
-      Settings      = 0x4
+      Settings     = 0x4
       PushPromise  = 0x5
-      Ping          = 0x6
-      GoAway        = 0x7
+      Ping         = 0x6
+      GoAway       = 0x7
       WindowUpdate = 0x8
-      Continuation  = 0x9
+      Continuation = 0x9
     end
 
     @[Flags]
     enum Flags : UInt8
       EndStream  =  0x1_u8
       EndHeaders =  0x4_u8
-      Padded      =  0x8_u8
-      Priority    = 0x20_u8
+      Padded     =  0x8_u8
+      Priority   = 0x20_u8
 
       def ack?
         end_stream?
