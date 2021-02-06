@@ -1,9 +1,9 @@
 require "./circular_buffer"
 
 module Duo
-  # Wraps a circular buffer to buffer incoming DATA. The buffer capacity is the
+  # Wraps a circular buffer to buffer incoming Data. The buffer capacity is the
   # initial window size. The stream window size decreases whenever reading and a
-  # WINDOW_UPDATE frame will be sent whenever the window size falls below half
+  # WindowUpdate frame will be sent whenever the window size falls below half
   # the buffer size (incremented by half the buffer size).
   class Data < IO
     # :nodoc:
@@ -26,9 +26,9 @@ module Duo
       @buffer ||= IO::CircularBuffer.new(@inbound_window_size)
     end
 
-    # Reads previously buffered DATA.
+    # Reads previously buffered Data.
     #
-    # If window size falls below half buffer capacity, sends a WINDOW_UPDATE
+    # If window size falls below half buffer capacity, sends a WindowUpdate
     # frame to increment the window size by half the buffer size, which fits
     # into the buffer's remaining space.
     def read(slice : Bytes) : Int32
@@ -50,7 +50,7 @@ module Duo
 
     # :nodoc:
     def write(slice : Bytes) : Nil
-      # Buffers *incoming* DATA from HTTP/2 connection.
+      # Buffers *incoming* Data from HTTP/2 connection.
       @size += slice.size
       buffer.write(slice)
     end
@@ -76,7 +76,7 @@ module Duo
       close_write
     end
 
-    # Returns the collected size in bytes of streamed DATA frames.
+    # Returns the collected size in bytes of streamed Data frames.
     def size
       @size
     end

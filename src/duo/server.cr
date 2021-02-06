@@ -157,8 +157,8 @@ module Duo
       connection.write_settings
 
       frame = connection.receive
-      unless frame.try(&.type) == Frame::Type::SETTINGS
-        raise Error.protocol_error("Expected SETTINGS frame")
+      unless frame.try(&.type) == Frame::Type::Settings
+        raise Error.protocol_error("Expected Settings frame")
       end
 
       if request
@@ -174,14 +174,14 @@ module Duo
         end
 
         case frame.type
-        when Frame::Type::HEADERS
+        when Frame::Type::Headers
           # don't dispatch twice
           next if frame.stream.trailing_headers?
           context = context_for(frame.stream)
           spawn handle_request(context.as(Context))
-        when Frame::Type::PUSH_PROMISE
-          raise Error.protocol_error("Unexpected PUSH_PROMISE frame")
-        when Frame::Type::GOAWAY
+        when Frame::Type::PushPromise
+          raise Error.protocol_error("Unexpected PushPromise frame")
+        when Frame::Type::GoAway
           break
         else
           # shut up, crystal

@@ -91,7 +91,7 @@ module Duo
       end
 
       def unbuffered_close
-        @stream.send_data("", flags: Frame::Flags::END_STREAM)
+        @stream.send_data("", flags: Frame::Flags::EndStream)
         @stream.send_rst_stream(Duo::Error::Code::NO_ERROR)
       end
 

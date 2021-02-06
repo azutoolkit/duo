@@ -2,24 +2,24 @@ module Duo
   class Frame
     # See https://tools.ietf.org/html/rfc7540#section-11.2
     enum Type
-      DATA          = 0x0
-      HEADERS       = 0x1
-      PRIORITY      = 0x2
-      RST_STREAM    = 0x3
-      SETTINGS      = 0x4
-      PUSH_PROMISE  = 0x5
-      PING          = 0x6
-      GOAWAY        = 0x7
-      WINDOW_UPDATE = 0x8
-      CONTINUATION  = 0x9
+      Data          = 0x0
+      Headers       = 0x1
+      Priority      = 0x2
+      RstStream    = 0x3
+      Settings      = 0x4
+      PushPromise  = 0x5
+      Ping          = 0x6
+      GoAway        = 0x7
+      WindowUpdate = 0x8
+      Continuation  = 0x9
     end
 
     @[Flags]
     enum Flags : UInt8
-      END_STREAM  =  0x1_u8
-      END_HEADERS =  0x4_u8
-      PADDED      =  0x8_u8
-      PRIORITY    = 0x20_u8
+      EndStream  =  0x1_u8
+      EndHeaders =  0x4_u8
+      Padded      =  0x8_u8
+      Priority    = 0x20_u8
 
       def ack?
         end_stream?
@@ -71,17 +71,6 @@ module Duo
     end
 
     protected def payload=(@payload : Bytes)
-    end
-
-    # :nodoc:
-    def debug(color = nil)
-      flags = (type == Type::SETTINGS || type == Type::PING) && @flags.value == 1 ? "ACK" : @flags
-      type = if color
-               @type.colorize(color)
-             else
-               @type
-             end
-      "#{type} frame <length=#{size}, flags=#{flags}, stream_id=#{stream.id}>"
     end
   end
 end

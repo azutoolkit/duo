@@ -13,7 +13,7 @@ module Duo
     end
 
     private getter io : IO
-    private ACK = Frame::Flags::END_STREAM
+    private ACK = Frame::Flags::EndStream
     getter local_settings : Settings = Settings::DEFAULT.dup
     getter remote_settings : Settings = Settings.new
     protected getter hpack_encoder : HPACK::Encoder
@@ -100,8 +100,8 @@ module Duo
 
     # Call in the main loop to receive individual frames.
     #
-    # Most frames are already being taken care of, so only HEADERS, DATA or
-    # PUSH_PROMISE frames should really be interesting. Other frames can be
+    # Most frames are already being taken care of, so only Headers, Data or
+    # PushPromise frames should really be interesting. Other frames can be
     # ignored safely.
     #
     # Unknown frame types are reported with a raw `Frame#payload`, so a client
@@ -114,33 +114,33 @@ module Duo
       stream.receiving(frame)
 
       case frame.type
-      when Frame::Type::DATA
+      when Frame::Type::Data
         raise Error.protocol_error if stream.id == 0
         read_data_frame(frame)
-      when Frame::Type::HEADERS
+      when Frame::Type::Headers
         raise Error.protocol_error if stream.id == 0
         read_headers_frame(frame)
-      when Frame::Type::PUSH_PROMISE
+      when Frame::Type::PushPromise
         raise Error.protocol_error if stream.id == 0
         read_push_promise_frame(frame)
-      when Frame::Type::PRIORITY
+      when Frame::Type::Priority
         raise Error.protocol_error if stream.id == 0
         read_priority_frame(frame)
-      when Frame::Type::RST_STREAM
+      when Frame::Type::RstStream
         raise Error.protocol_error if stream.id == 0
         read_rst_stream_frame(frame)
-      when Frame::Type::SETTINGS
+      when Frame::Type::Settings
         raise Error.protocol_error unless stream.id == 0
         read_settings_frame(frame)
-      when Frame::Type::PING
+      when Frame::Type::Ping
         raise Error.protocol_error unless stream.id == 0
         read_ping_frame(frame)
-      when Frame::Type::GOAWAY
+      when Frame::Type::GoAway
         read_goaway_frame(frame)
-      when Frame::Type::WINDOW_UPDATE
+      when Frame::Type::WindowUpdate
         read_window_update_frame(frame)
-      when Frame::Type::CONTINUATION
-        raise Error.protocol_error("UNEXPECTED CONTINUATION frame")
+      when Frame::Type::Continuation
+        raise Error.protocol_error("UNEXPECTED Continuation frame")
       else
         read_unsupported_frame(frame)
       end
@@ -208,7 +208,7 @@ module Duo
       end
     end
 
-    # TODO: if HEADERS has END_STREAM flag tell STREAM that it WON'T receive DATA
+    # TODO: if Headers has EndStream flag tell STREAM that it WON'T receive Data
     private def read_headers_frame(frame)
       stream = frame.stream
 
@@ -314,7 +314,7 @@ module Duo
         break if frame.flags.end_headers?
 
         frame = read_frame_header
-        unless frame.type == Frame::Type::CONTINUATION
+        unless frame.type == Frame::Type::Continuation
           raise Error.protocol_error("EXPECTED continuation frame")
         end
         unless frame.stream == stream
@@ -382,8 +382,8 @@ module Duo
         end
       end
 
-      # ACK reception of remote SETTINGS:
-      send Frame.new(Frame::Type::SETTINGS, frame.stream, ACK)
+      # ACK reception of remote Settings:
+      send Frame.new(Frame::Type::Settings, frame.stream, ACK)
     end
 
     private def read_ping_frame(frame)
@@ -393,10 +393,10 @@ module Duo
 
       if frame.flags.ack?
         print buffer
-        # TODO: validate buffer == previously sent PING value
-        # send Frame.new(Frame::Type::GOAWAY, frame.stream, ACK, buffer.to_slice)
+        # TODO: validate buffer == previously sent Ping value
+        # send Frame.new(Frame::Type::GoAway, frame.stream, ACK, buffer.to_slice)
       else
-        send Frame.new(Frame::Type::PING, frame.stream, ACK, buffer.to_slice)
+        send Frame.new(Frame::Type::Ping, frame.stream, ACK, buffer.to_slice)
       end
     end
 
@@ -441,32 +441,32 @@ module Duo
     # sliced (in order to respect max frame size) but must be sent as a single
     # block (multiplexing would cause a protocol error).
     #
-    # So far this only applies to HEADERS (and PUSH_PROMISE) and CONTINUATION
+    # So far this only applies to Headers (and PushPromise) and Continuation
     # frames, otherwise HPACK compression synchronisation could end up corrupted
-    # if another HEADERS frame for another stream was sent in between.
+    # if another Headers frame for another stream was sent in between.
     def send(frame : Frame | Array(Frame)) : Nil
       @channel.send(frame) unless @channel.closed?
     end
 
     # Immediately writes local settings to the connection.
     #
-    # This is UNSAFE and MUST only be called for sending the initial SETTINGS
+    # This is UNSAFE and MUST only be called for sending the initial Settings
     # frame. Sending changes to `#local_settings` once the connection
     # established MUST use `#send_settings` instead!
     def write_settings : Nil
-      write Frame.new(Duo::Frame::Type::SETTINGS, streams.find(0), payload: local_settings.to_payload)
+      write Frame.new(Duo::Frame::Type::Settings, streams.find(0), payload: local_settings.to_payload)
     end
 
-    # Sends a SETTINGS frame for the current `#local_settings` values.
+    # Sends a Settings frame for the current `#local_settings` values.
     def send_settings : Nil
-      send Frame.new(Duo::Frame::Type::SETTINGS, streams.find(0), payload: local_settings.to_payload)
+      send Frame.new(Duo::Frame::Type::Settings, streams.find(0), payload: local_settings.to_payload)
     end
 
     private def write(frame : Frame, flush = true)
       size = frame.payload?.try(&.size.to_u32) || 0_u32
       stream = frame.stream
 
-      stream.sending(frame) unless frame.type == Frame::Type::PUSH_PROMISE
+      stream.sending(frame) unless frame.type == Frame::Type::PushPromise
 
       io.write_bytes((size << 8) | frame.type.to_u8, IO::ByteFormat::BigEndian)
       io.write_byte(frame.flags.to_u8)
@@ -481,9 +481,9 @@ module Duo
       end
     end
 
-    # Keeps the inbound window size (when receiving DATA frames). If the
+    # Keeps the inbound window size (when receiving Data frames). If the
     # available size shrinks below half the initial window size, then we send a
-    # WINDOW_UPDATE frame to increment it by the initial window size * the
+    # WindowUpdate frame to increment it by the initial window size * the
     # number of active streams, respecting `MAXIMUM_WINDOW_SIZE`.
     private def consume_inbound_window_size(len)
       @inbound_window_size -= len
@@ -528,7 +528,7 @@ module Duo
 
     # Terminates the HTTP/2 connection.
     #
-    # This will send a GOAWAY frame if *notify* is true, reporting an
+    # This will send a GoAway frame if *notify* is true, reporting an
     # `Error::Code` optional message if present to report an error, or
     # `Error::Code::NO_ERROR` to terminate the connection cleanly.
     def close(error : Error? = nil, notify : Bool = true)
@@ -548,7 +548,7 @@ module Duo
           payload << message
 
           # FIXME: shouldn't write directly to IO
-          write Frame.new(Frame::Type::GOAWAY, streams.find(0), payload: payload.to_slice)
+          write Frame.new(Frame::Type::GoAway, streams.find(0), payload: payload.to_slice)
         end
       end
 

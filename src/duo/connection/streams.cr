@@ -18,7 +18,7 @@ module Duo
     # Finds an existing stream, silently creating it if it doesn't exist yet.
     #
     # Takes care to increment `highest_remote_id` counter for an incoming
-    # stream, unless `consume` is set to false, for example a PRIORITY frame
+    # stream, unless `consume` is set to false, for example a Priority frame
     # forward declares a stream priority/dependency but doesn't consume the
     # stream identifiers, so they are still valid.
     def find(id : Int32, consume : Bool = true)
