@@ -82,12 +82,11 @@ module Duo
       when Closed
         case frame.type
         when Frame::Type::WindowUpdate, Frame::Type::RstStream
-          # ignore
         else
           if receiving
             raise Error.stream_closed
           else
-            raise Error.internal_error
+            frame.stream.rst_stream(Error::Code::InternalError)
           end
         end
       end

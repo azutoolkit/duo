@@ -42,31 +42,23 @@ module Duo
     # TODO: Maybe extract as a nicer struct?
     private def frame_writer
       loop do
+        # OPTIMIZE: follow stream priority to send frames
         begin
-          # OPTIMIZE: follow stream priority to send frames
-          if frame = @channel.receive
-            begin
-              case frame
-              when Array
-                frame.each do |f|
-                  write(f, flush: false)
-                end
-              else
-                write(frame, flush: false)
-              end
-            ensure
-              # flush pending frames when there are no more frames to send,
-              # otherwise let IO::Buffered do its job:
-              #
-              # NOTE: accessing internal @queue until Channel#empty? makes a comeback
-              io.flush if @channel.@queue.not_nil!.empty?
-            end
+          case frame = @channel.receive
+          when Array(Frame) then frame.each { |f| write(f, flush: false) }
+          when Frame then write(frame, flush: false)
           else
             io.close unless io.closed?
             break
           end
         rescue Channel::ClosedError
           break
+        ensure
+          # flush pending frames when there are no more frames to send,
+          # otherwise let IO::Buffered do its job:
+          #
+          # NOTE: accessing internal @queue until Channel#empty? makes a comeback
+          io.flush if @channel.@queue.not_nil!.empty?
         end
       end
     end
