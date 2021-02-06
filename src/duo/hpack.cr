@@ -6,7 +6,7 @@ module Duo
 
     def self.encoder
       HPACK::Encoder.new(
-        max_table_size: local_settings.header_table_size,
+        max_table_size: DEFAULT_HEADER_TABLE_SIZE,
         indexing: HPACK::Indexing::NONE,
         huffman: true
       )
@@ -14,7 +14,7 @@ module Duo
 
     def self.decoder
       HPACK::Decoder.new(
-        max_table_size: remote_settings.header_table_size
+        max_table_size: DEFAULT_HEADER_TABLE_SIZE
       )
     end
   end
