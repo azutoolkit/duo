@@ -12,6 +12,14 @@ module Duo
       GoAway       = 0x7
       WindowUpdate = 0x8
       Continuation = 0x9
+
+      def self.non_transitional?(type)
+        [
+          Frame::Type::Priority,
+          Frame::Type::GoAway,
+          Frame::Type::Ping,
+        ].includes?(type)
+      end
     end
 
     @[Flags]

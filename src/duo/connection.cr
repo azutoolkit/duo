@@ -170,6 +170,7 @@ module Duo
     private def read_frame_header
       buf = io.read_bytes(UInt32, IO::ByteFormat::BigEndian)
       size, type = (buf >> 8).to_i, buf & 0xff
+      
       flags = Frame::Flags.new(read_byte)
       _, stream_id = read_stream_id
 
@@ -493,7 +494,7 @@ module Duo
         # if @inbound_window_size <= 0
         increment = Math.min(initial_window_size * streams.active_count(1), MAXIMUM_WINDOW_SIZE)
         @inbound_window_size += increment
-        streams.find(0).send_window_update_frame(increment)
+        streams.find(0).window_update(increment)
       end
     end
 

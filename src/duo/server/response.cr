@@ -74,9 +74,9 @@ module Duo
       def unbuffered_write(bytes : Bytes)
         unless @sent_headers
           @sent_headers = true
-          @stream.send_headers(@headers)
+          @stream.headers(@headers)
         end
-        @stream.send_data(bytes)
+        @stream.data(bytes)
         bytes.size
       end
 
@@ -91,8 +91,8 @@ module Duo
       end
 
       def unbuffered_close
-        @stream.send_data("", flags: Frame::Flags::EndStream)
-        @stream.send_rst_stream(Duo::Error::Code::NoError)
+        @stream.data("", flags: Frame::Flags::EndStream)
+        @stream.rst_stream(Duo::Error::Code::NoError)
       end
 
       def upgrade(protocol : String, &block)
