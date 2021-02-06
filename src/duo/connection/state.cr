@@ -1,15 +1,15 @@
 module Duo
   enum State
-    IDLE
+    Idle
     ReservedLocal
     ReservedRemote
-    OPEN
+    Open
     HalfClosedLocal
     HalfClosedRemote
     Closed
 
     def active?
-      self == OPEN ||
+      self == Open ||
       self == HalfClosedLocal ||
       self == HalfClosedRemote
     end

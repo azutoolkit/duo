@@ -14,11 +14,11 @@ module Duo
     protected getter outbound_window_size : Int32
 
     # :nodoc:
-    protected def initialize(@connection, @id, @priority = DEFAULT_PRIORITY.dup, @state = State::IDLE)
+    protected def initialize(@connection, @id, @priority = DEFAULT_PRIORITY.dup, @state = State::Idle)
       @outbound_window_size = connection.remote_settings.initial_window_size
     end
 
-    # Returns true if the stream is in an active `#state`, that is OPEN or
+    # Returns true if the stream is in an active `#state`, that is Open or
     # HALF_CLOSED (local or remote).
     def active? : Bool
       state.active?
@@ -270,10 +270,10 @@ module Duo
       return if frame.stream.id == 0 || NON_TRANSITIONAL_FRAMES.includes?(frame.type)
 
       case state
-      when State::IDLE
+      when State::Idle
         case frame.type
         when Frame::Type::Headers
-          self.state = frame.flags.end_stream? ? State::HalfClosedRemote : State::OPEN
+          self.state = frame.flags.end_stream? ? State::HalfClosedRemote : State::Open
         when Frame::Type::PushPromise
           self.state = receiving ? State::ReservedRemote : State::ReservedLocal
         else
@@ -301,7 +301,7 @@ module Duo
         else
           error!(receiving)
         end
-      when State::OPEN
+      when State::Open
         case frame.type
         when Frame::Type::Headers, Frame::Type::Data
           if frame.flags.end_stream?

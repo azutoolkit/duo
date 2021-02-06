@@ -55,7 +55,7 @@ module Duo
 
     # Creates an outgoing stream. For example to handle a client request or a
     # server push.
-    def create(state = Stream::State::IDLE)
+    def create(state = Stream::State::Idle)
       @mutex.synchronize do
         if max = @connection.remote_settings.max_concurrent_streams
           if active_count(0) >= max
