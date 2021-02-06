@@ -68,7 +68,7 @@ module Duo
 
     protected def increment_outbound_window_size(increment) : Nil
       if @outbound_window_size.to_i64 + increment > MAXIMUM_WINDOW_SIZE
-        send_rst_stream(Error::Code::FLOW_CONTROL_ERROR)
+        send_rst_stream(Error::Code::FlowControlError)
         return
       end
       @outbound_window_size += increment

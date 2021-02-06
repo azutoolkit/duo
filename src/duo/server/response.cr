@@ -92,7 +92,7 @@ module Duo
 
       def unbuffered_close
         @stream.send_data("", flags: Frame::Flags::EndStream)
-        @stream.send_rst_stream(Duo::Error::Code::NO_ERROR)
+        @stream.send_rst_stream(Duo::Error::Code::NoError)
       end
 
       def upgrade(protocol : String, &block)

@@ -1,20 +1,20 @@
 module Duo
   class Error < Exception
     enum Code : UInt32
-      NO_ERROR            = 0x0
-      PROTOCOL_ERROR      = 0x1
-      INTERNAL_ERROR      = 0x2
-      FLOW_CONTROL_ERROR  = 0x3
-      SETTINGS_TIMEOUT    = 0x4
-      STREAM_CLOSED       = 0x5
-      FRAME_SIZE_ERROR    = 0x6
-      REFUSED_STREAM      = 0x7
-      CANCEL              = 0x8
-      COMPRESSION_ERROR   = 0x9
-      CONNECT_ERROR       = 0xa
-      ENHANCE_YOUR_CALM   = 0xb
-      INADEQUATE_SECURITY = 0xc
-      HTTP_1_1_REQUIRED   = 0xd
+      NoError            = 0x0
+      ProtocolError      = 0x1
+      InternalError      = 0x2
+      FlowControlError   = 0x3
+      SettingsTimeout    = 0x4
+      StreamClosed       = 0x5
+      FrameSizeError     = 0x6
+      RefusedStream      = 0x7
+      Cancel             = 0x8
+      CompressionError   = 0x9
+      ConnectError       = 0xa
+      EnhanceYourCalm    = 0xb
+      InadequateSecurity = 0xc
+      Http11Required     = 0xd
     end
 
     getter code : Code
@@ -26,7 +26,7 @@ module Duo
     end
 
     {% for code in Code.constants %}
-      def self.{{ code.downcase }}(message = "")
+      def self.{{ code.underscore }}(message = "")
         new Code::{{ code.id }}, 0, message
       end
     {% end %}

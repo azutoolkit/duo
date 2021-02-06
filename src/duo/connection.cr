@@ -200,7 +200,7 @@ module Duo
 
           if content_length = stream.headers["content-length"]?
             unless content_length.to_i == stream.data.size
-              # stream.send_rst_stream(Error::Code::PROTOCOL_ERROR)
+              # stream.send_rst_stream(Error::Code::ProtocolError)
               raise Error.protocol_error("MALFORMED data frame")
             end
           end
@@ -249,7 +249,7 @@ module Duo
 
           if content_length = stream.headers["content-length"]?
             unless content_length.to_i == stream.data.size
-              # connection.send_rst_stream(Error::Code::PROTOCOL_ERROR)
+              # connection.send_rst_stream(Error::Code::ProtocolError)
               raise Error.protocol_error("MALFORMED data frame")
             end
           end
@@ -410,7 +410,7 @@ module Duo
 
       close(notify: false)
 
-      unless error_code == Error::Code::NO_ERROR
+      unless error_code == Error::Code::NoError
         raise ClientError.new(error_code, last_stream_id, error_message)
       end
     end
@@ -530,7 +530,7 @@ module Duo
     #
     # This will send a GoAway frame if *notify* is true, reporting an
     # `Error::Code` optional message if present to report an error, or
-    # `Error::Code::NO_ERROR` to terminate the connection cleanly.
+    # `Error::Code::NoError` to terminate the connection cleanly.
     def close(error : Error? = nil, notify : Bool = true)
       return if closed?
       @closed = true
@@ -540,7 +540,7 @@ module Duo
           if error
             message, code = error.message || "", error.code
           else
-            message, code = "", Error::Code::NO_ERROR
+            message, code = "", Error::Code::NoError
           end
           payload = IO::Memory.new(8 + message.bytesize)
           payload.write_bytes(streams.last_stream_id.to_u32, IO::ByteFormat::BigEndian)

@@ -70,7 +70,7 @@ module Duo
       yield stream.headers, stream.data
 
       if stream.active?
-        stream.send_rst_stream(Error::Code::NO_ERROR)
+        stream.send_rst_stream(Error::Code::NoError)
       end
     end
 
