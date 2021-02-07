@@ -31,7 +31,7 @@ module Duo
       connection.write_settings
 
       frame = connection.receive
-      unless frame.try(&.type) == Frame::Type::Settings
+      unless frame.try(&.type) == FrameType::Settings
         raise Error.protocol_error("Expected Settings frame")
       end
 
@@ -45,11 +45,11 @@ module Duo
           next
         end
         case frame.type
-        when Frame::Type::Headers
+        when FrameType::Headers
           @requests[frame.stream].send(nil)
-        when Frame::Type::PushPromise
+        when FrameType::PushPromise
           # TODO: got SERVER PUSHed headers
-        when Frame::Type::GoAway
+        when FrameType::GoAway
           break
         else
           # shut up, crystal

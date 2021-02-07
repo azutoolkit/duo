@@ -14,7 +14,6 @@ module Duo
     getter outbound_window_size : Int32
     getter headers = HTTP::Headers.new
 
-    # :nodoc:
     def initialize(@connection, @id, @priority = DEFAULT_PRIORITY.dup, @state = State::Idle)
       @outbound_window_size = connection.remote_settings.initial_window_size
     end
@@ -69,7 +68,7 @@ module Duo
       end
       io = IO::Memory.new(WINDOW_UPDATE_FRAME_SIZE)
       io.write_bytes(increment.to_u32 & 0x7fffffff_u32, IO::ByteFormat::BigEndian)
-      connection.send Frame.new(Frame::Type::WindowUpdate, self, payload: io.to_slice)
+      connection.send Frame.new(FrameType::WindowUpdate, self, payload: io.to_slice)
     end
 
     def priority : Nil
@@ -80,12 +79,12 @@ module Duo
       io.write_bytes(exclusive | dep_stream_id, IO::ByteFormat::BigEndian)
       io.write_byte((priority.weight - 1).to_u8)
 
-      connection.send Frame.new(Frame::Type::Priority, self, payload: io.to_slice)
+      connection.send Frame.new(FrameType::Priority, self, payload: io.to_slice)
     end
 
     def headers(headers : HTTP::Headers, flags : Frame::Flags = Frame::Flags::None) : Nil
       payload = connection.hpack_encoder.encode(headers)
-      headers(Frame::Type::Headers, headers, flags, payload)
+      headers(FrameType::Headers, headers, flags, payload)
     end
 
     def push_promise(headers : HTTP::Headers, flags : Frame::Flags = Frame::Flags::None) : Stream?
@@ -96,11 +95,11 @@ module Duo
         io = IO::Memory.new
         io.write_bytes(stream.id.to_u32 & 0x7fffffff_u32, IO::ByteFormat::BigEndian)
         payload = connection.hpack_encoder.encode(headers, writer: io)
-        headers(Frame::Type::PushPromise, headers, flags, payload)
+        headers(FrameType::PushPromise, headers, flags, payload)
       end
     end
 
-    def headers(type : Frame::Type, headers, flags, payload) : Nil
+    def headers(type : FrameType, headers, flags, payload) : Nil
       max_frame_size = connection.remote_settings.max_frame_size
 
       if payload.size <= max_frame_size
@@ -113,7 +112,7 @@ module Duo
         offset = 0
 
         frames = num.times.map do |index|
-          type = Frame::Type::Continuation if index > 1
+          type = FrameType::Continuation if index > 1
           offset = index * max_frame_size
           if index == num
             count = payload.size - offset
@@ -154,7 +153,7 @@ module Duo
         end_stream = false
       end
 
-      frame = Frame.new(Frame::Type::Data, self, flags)
+      frame = Frame.new(FrameType::Data, self, flags)
 
       if data.size == 0
         connection.send(frame)
@@ -208,7 +207,7 @@ module Duo
     def rst_stream(error_code : Error::Code) : Nil
       io = IO::Memory.new(RST_STREAM_FRAME_SIZE)
       io.write_bytes(error_code.value.to_u32, IO::ByteFormat::BigEndian)
-      connection.send Frame.new(Frame::Type::RstStream, self, payload: io.to_slice)
+      connection.send Frame.new(FrameType::RstStream, self, payload: io.to_slice)
     end
 
     def receiving(frame : Frame)

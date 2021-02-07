@@ -1,12 +1,15 @@
 require "colorize"
 require "./hpack"
-require "./connection/errors"
-require "./connection/frame"
-require "./connection/settings"
-require "./connection/streams"
+require "./errors"
+require "./frame"
+require "./settings"
+require "./streams"
+require "./emittable"
 
 module Duo
   class Connection
+    include Emittable
+
     enum Type
       CLIENT
       SERVER
@@ -19,7 +22,6 @@ module Duo
     protected getter hpack_encoder : HPACK::Encoder
     protected getter hpack_decoder : HPACK::Decoder
 
-    @channel = Channel(Frame | Array(Frame) | Nil).new(10)
     @closed = false
     @hpack_encoder = HPack.encoder
     @hpack_decoder = HPack.decoder
@@ -37,30 +39,6 @@ module Duo
       # FIXME: thread safety?
       #        can't be in #initialize because of self reference
       @streams ||= Streams.new(self, @type)
-    end
-
-    # TODO: Maybe extract as a nicer struct?
-    private def frame_writer
-      loop do
-        # OPTIMIZE: follow stream priority to send frames
-        begin
-          case frame = @channel.receive
-          when Array(Frame) then frame.each { |f| write(f, flush: false) }
-          when Frame then write(frame, flush: false)
-          else
-            io.close unless io.closed?
-            break
-          end
-        rescue Channel::ClosedError
-          break
-        ensure
-          # flush pending frames when there are no more frames to send,
-          # otherwise let IO::Buffered do its job:
-          #
-          # NOTE: accessing internal @queue until Channel#empty? makes a comeback
-          io.flush if @channel.@queue.not_nil!.empty?
-        end
-      end
     end
 
     # Reads the expected `Duo::CLIENT_PREFACE` for a server context.
@@ -106,32 +84,16 @@ module Duo
       stream.receiving(frame)
 
       case frame.type
-      when Frame::Type::Data
-        raise Error.protocol_error if stream.id == 0
-        read_data_frame(frame)
-      when Frame::Type::Headers
-        raise Error.protocol_error if stream.id == 0
-        read_headers_frame(frame)
-      when Frame::Type::PushPromise
-        raise Error.protocol_error if stream.id == 0
-        read_push_promise_frame(frame)
-      when Frame::Type::Priority
-        raise Error.protocol_error if stream.id == 0
-        read_priority_frame(frame)
-      when Frame::Type::RstStream
-        raise Error.protocol_error if stream.id == 0
-        read_rst_stream_frame(frame)
-      when Frame::Type::Settings
-        raise Error.protocol_error unless stream.id == 0
-        read_settings_frame(frame)
-      when Frame::Type::Ping
-        raise Error.protocol_error unless stream.id == 0
-        read_ping_frame(frame)
-      when Frame::Type::GoAway
-        read_goaway_frame(frame)
-      when Frame::Type::WindowUpdate
-        read_window_update_frame(frame)
-      when Frame::Type::Continuation
+      when FrameType::Data         then read_data_frame(frame)
+      when FrameType::Headers      then read_headers_frame(frame)
+      when FrameType::PushPromise  then read_push_promise_frame(frame)
+      when FrameType::Priority     then read_priority_frame(frame)
+      when FrameType::RstStream    then read_rst_stream_frame(frame)
+      when FrameType::Settings     then read_settings_frame(frame)
+      when FrameType::Ping         then read_ping_frame(frame)
+      when FrameType::GoAway       then read_goaway_frame(frame)
+      when FrameType::WindowUpdate then read_window_update_frame(frame)
+      when FrameType::Continuation
         raise Error.protocol_error("UNEXPECTED Continuation frame")
       else
         read_unsupported_frame(frame)
@@ -162,7 +124,7 @@ module Duo
     private def read_frame_header
       buf = io.read_bytes(UInt32, IO::ByteFormat::BigEndian)
       size, type = (buf >> 8).to_i, buf & 0xff
-      
+
       flags = Frame::Flags.new(read_byte)
       _, stream_id = read_stream_id
 
@@ -170,18 +132,17 @@ module Duo
         raise Error.frame_size_error
       end
 
-      frame_type = Frame::Type.new(type.to_i)
+      frame_type = FrameType.new(type.to_i)
       unless frame_type.priority? || streams.valid?(stream_id)
         raise Error.protocol_error("INVALID stream_id ##{stream_id}")
       end
 
       stream = streams.find(stream_id, consume: !frame_type.priority?)
-      frame = Frame.new(frame_type, stream, flags, size: size)
-
-      frame
+      Frame.new(frame_type, stream, flags, size: size)
     end
 
     private def read_data_frame(frame)
+      raise Error.protocol_error if frame.stream.id == 0
       stream = frame.stream
 
       read_padded(frame) do |size|
@@ -201,8 +162,8 @@ module Duo
       end
     end
 
-    # TODO: if Headers has EndStream flag tell STREAM that it WON'T receive Data
     private def read_headers_frame(frame)
+      raise Error.protocol_error if frame.stream.id == 0
       stream = frame.stream
 
       read_padded(frame) do |size|
@@ -236,13 +197,10 @@ module Duo
         end
 
         if stream.data?
-          # https://tools.ietf.org/html/rfc7540#section-8.1
-          # https://tools.ietf.org/html/rfc7230#section-4.1.2
           stream.data.close_write
 
           if content_length = stream.headers["content-length"]?
             unless content_length.to_i == stream.data.size
-              # connection.send_rst_stream(Error::Code::ProtocolError)
               raise Error.protocol_error("MALFORMED data frame")
             end
           end
@@ -307,7 +265,7 @@ module Duo
         break if frame.flags.end_headers?
 
         frame = read_frame_header
-        unless frame.type == Frame::Type::Continuation
+        unless frame.type == FrameType::Continuation
           raise Error.protocol_error("EXPECTED continuation frame")
         end
         unless frame.stream == stream
@@ -325,6 +283,7 @@ module Duo
     end
 
     private def read_push_promise_frame(frame)
+      raise Error.protocol_error if frame.stream.id == 0
       stream = frame.stream
 
       read_padded(frame) do |size|
@@ -336,6 +295,7 @@ module Duo
     end
 
     private def read_priority_frame(frame)
+      raise Error.protocol_error if frame.stream.id == 0
       stream = frame.stream
       raise Error.frame_size_error unless frame.size == PRIORITY_FRAME_SIZE
 
@@ -347,11 +307,13 @@ module Duo
     end
 
     private def read_rst_stream_frame(frame)
+      raise Error.protocol_error if frame.stream.id == 0
       raise Error.frame_size_error unless frame.size == RST_STREAM_FRAME_SIZE
       error_code = Error::Code.new(io.read_bytes(UInt32, IO::ByteFormat::BigEndian))
     end
 
     private def read_settings_frame(frame)
+      raise Error.protocol_error unless frame.stream.id == 0
       raise Error.frame_size_error unless frame.size % 6 == 0
       return if frame.flags.ack?
 
@@ -370,26 +332,19 @@ module Duo
               stream.increment_outbound_window_size(difference)
             end
           end
-        else
-          # shut up, crystal
         end
       end
-
-      # ACK reception of remote Settings:
-      send Frame.new(Frame::Type::Settings, frame.stream, ACK)
+      send Frame.new(FrameType::Settings, frame.stream, ACK)
     end
 
     private def read_ping_frame(frame)
+      raise Error.protocol_error unless frame.stream.id == 0
       raise Error.frame_size_error unless frame.size == PING_FRAME_SIZE
       buffer = uninitialized UInt8[8] # PING_FRAME_SIZE
       io.read_fully(buffer.to_slice)
 
-      if frame.flags.ack?
-        print buffer
-        # TODO: validate buffer == previously sent Ping value
-        # send Frame.new(Frame::Type::GoAway, frame.stream, ACK, buffer.to_slice)
-      else
-        send Frame.new(Frame::Type::Ping, frame.stream, ACK, buffer.to_slice)
+      unless frame.flags.ack?
+        send Frame.new(FrameType::Ping, frame.stream, ACK, buffer.to_slice)
       end
     end
 
@@ -428,38 +383,25 @@ module Duo
       io.read(frame.payload)
     end
 
-    # Sends a frame to the connected peer.
-    #
-    # One may also send an Array(Frame) for the case when some frames must be
-    # sliced (in order to respect max frame size) but must be sent as a single
-    # block (multiplexing would cause a protocol error).
-    #
-    # So far this only applies to Headers (and PushPromise) and Continuation
-    # frames, otherwise HPACK compression synchronisation could end up corrupted
-    # if another Headers frame for another stream was sent in between.
-    def send(frame : Frame | Array(Frame)) : Nil
-      @channel.send(frame) unless @channel.closed?
-    end
-
     # Immediately writes local settings to the connection.
     #
     # This is UNSAFE and MUST only be called for sending the initial Settings
     # frame. Sending changes to `#local_settings` once the connection
     # established MUST use `#send_settings` instead!
     def write_settings : Nil
-      write Frame.new(Duo::Frame::Type::Settings, streams.find(0), payload: local_settings.to_payload)
+      write Frame.new(Duo::FrameType::Settings, streams.find(0), payload: local_settings.to_payload)
     end
 
     # Sends a Settings frame for the current `#local_settings` values.
     def send_settings : Nil
-      send Frame.new(Duo::Frame::Type::Settings, streams.find(0), payload: local_settings.to_payload)
+      send Frame.new(Duo::FrameType::Settings, streams.find(0), payload: local_settings.to_payload)
     end
 
     private def write(frame : Frame, flush = true)
       size = frame.payload?.try(&.size.to_u32) || 0_u32
       stream = frame.stream
 
-      stream.sending(frame) unless frame.type == Frame::Type::PushPromise
+      stream.sending(frame) unless frame.type == FrameType::PushPromise
 
       io.write_bytes((size << 8) | frame.type.to_u8, IO::ByteFormat::BigEndian)
       io.write_byte(frame.flags.to_u8)
@@ -541,14 +483,11 @@ module Duo
           payload << message
 
           # FIXME: shouldn't write directly to IO
-          write Frame.new(Frame::Type::GoAway, streams.find(0), payload: payload.to_slice)
+          write Frame.new(FrameType::GoAway, streams.find(0), payload: payload.to_slice)
         end
       end
 
-      unless @channel.closed?
-        @channel.send(nil)
-        @channel.close
-      end
+      close_channel!
     end
 
     def closed?

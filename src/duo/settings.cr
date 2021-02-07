@@ -23,7 +23,6 @@ module Duo
           id = from_value?(io.read_bytes(UInt16, IO::ByteFormat::BigEndian))
           value = io.read_bytes(UInt32, IO::ByteFormat::BigEndian).to_i32
           next unless id # unknown setting identifier
-
           yield id, value
 
           case id
@@ -95,7 +94,7 @@ module Duo
 
     def enable_push=(value)
       raise Error.protocol_error unless value == 0 || value == 1
-      @enable_push = (value == 1)
+      @enable_push = value == 1
     end
 
     def to_payload : Bytes

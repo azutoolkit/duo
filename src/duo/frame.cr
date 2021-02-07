@@ -1,26 +1,6 @@
 module Duo
   class Frame
     # See https://tools.ietf.org/html/rfc7540#section-11.2
-    enum Type
-      Data         = 0x0
-      Headers      = 0x1
-      Priority     = 0x2
-      RstStream    = 0x3
-      Settings     = 0x4
-      PushPromise  = 0x5
-      Ping         = 0x6
-      GoAway       = 0x7
-      WindowUpdate = 0x8
-      Continuation = 0x9
-
-      def self.non_transitional?(type)
-        [
-          Frame::Type::Priority,
-          Frame::Type::GoAway,
-          Frame::Type::Ping,
-        ].includes?(type)
-      end
-    end
 
     @[Flags]
     enum Flags : UInt8
@@ -56,8 +36,8 @@ module Duo
       end
     end
 
-    getter type : Type
-    protected setter type : Type
+    getter type : FrameType
+    protected setter type : FrameType
 
     getter stream : Stream
 
@@ -69,7 +49,7 @@ module Duo
     @size : Int32?
 
     # :nodoc:
-    protected def initialize(@type : Type, @stream : Stream, @flags : Flags = Flags::None, @payload : Bytes? = nil, size : Int32? = nil)
+    protected def initialize(@type : FrameType, @stream : Stream, @flags : Flags = Flags::None, @payload : Bytes? = nil, size : Int32? = nil)
       @size = size.try(&.to_i32)
     end
 

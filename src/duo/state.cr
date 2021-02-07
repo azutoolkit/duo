@@ -9,21 +9,19 @@ module Duo
     Closed
 
     def active?
-      self == Open ||
-        self == HalfClosedLocal ||
-        self == HalfClosedRemote
+      open? || half_closed_local? || half_closed_remote?
     end
 
     def transition(frame : Frame, receiving = false)
-      return if frame.stream.id == 0 || Frame::Type.non_transitional?(frame.type)
+      return if frame.stream.id == 0 || FrameType.non_transitional?(frame.type)
       stream = frame.stream
 
       case self
       when Idle
         case frame.type
-        when Frame::Type::Headers
+        when FrameType::Headers
           stream.state = frame.flags.end_stream? ? HalfClosedRemote : Open
-        when Frame::Type::PushPromise
+        when FrameType::PushPromise
           stream.state = receiving ? ReservedRemote : ReservedLocal
         else
           error!(receiving)
@@ -32,9 +30,9 @@ module Duo
         error!(receiving) if receiving
 
         case frame.type
-        when Frame::Type::Headers
+        when FrameType::Headers
           stream.state = HalfClosedLocal
-        when Frame::Type::RstStream
+        when FrameType::RstStream
           stream.state = Closed
         else
           error!(receiving)
@@ -43,45 +41,43 @@ module Duo
         error!(receiving) unless receiving
 
         case frame.type
-        when Frame::Type::Headers
+        when FrameType::Headers
           stream.state = HalfClosedRemote
-        when Frame::Type::RstStream
+        when FrameType::RstStream
           stream.state = Closed
         else
           error!(receiving)
         end
       when Open
         case frame.type
-        when Frame::Type::Headers, Frame::Type::Data
+        when FrameType::Headers, FrameType::Data
           if frame.flags.end_stream?
             stream.state = receiving ? HalfClosedRemote : HalfClosedLocal
           end
-        when Frame::Type::RstStream
+        when FrameType::RstStream
           stream.state = Closed
-        when Frame::Type::WindowUpdate
+        when FrameType::WindowUpdate
           # ignore
         else
           error!(receiving)
         end
       when HalfClosedLocal
-        if frame.flags.end_stream? || frame.type == Frame::Type::RstStream
+        if frame.flags.end_stream? || frame.type.rst_stream?
           stream.state = Closed
         end
       when HalfClosedRemote
         if receiving
           case frame.type
-          when Frame::Type::Headers, Frame::Type::Continuation, Frame::Type::Data
+          when FrameType::Headers, FrameType::Continuation, FrameType::Data
             raise Error.stream_closed
-          else
-            # shut up, crystal
           end
         end
-        if frame.flags.end_stream? || frame.type == Frame::Type::RstStream
+        if frame.flags.end_stream? || frame.type == FrameType::RstStream
           stream.state = Closed
         end
       when Closed
         case frame.type
-        when Frame::Type::WindowUpdate, Frame::Type::RstStream
+        when FrameType::WindowUpdate, FrameType::RstStream
         else
           if receiving
             raise Error.stream_closed
@@ -100,7 +96,6 @@ module Duo
       end
     end
 
-    # :nodoc:
     def to_s(io)
       io << "#{self}"
     end
