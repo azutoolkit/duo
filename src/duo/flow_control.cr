@@ -1,14 +1,10 @@
 module Duo
   module FlowControl
     macro included
-      getter local_window_size = DEFAULT_INITIAL_WINDOW_SIZE
-
+      @closed = false
       @channel = Channel(Frame | Array(Frame) | Nil).new(10)
-      @remote_window_size = Atomic(Int32).new(DEFAULT_INITIAL_WINDOW_SIZE)
-    end
-
-    def remote_window_size
-      @remote_window_size.get
+      getter remote_window_size = DEFAULT_INITIAL_WINDOW_SIZE
+      getter local_window_size = DEFAULT_INITIAL_WINDOW_SIZE
     end
 
     def receive_frame
@@ -69,17 +65,11 @@ module Duo
       end
     end
 
-    # ## WINDOW UPDATE STUFF
-    ############################################################################
-    # Keeps the inbound window size (when receiving Data frames). If the
-    # available size shrinks below half the initial window size, then we send a
-    # WindowUpdate frame to increment it by the initial window size * the
-    # number of active streams, respecting `MAXIMUM_WINDOW_SIZE`.
     def update_local_window(size)
       @local_window_size -= size
       initial_window_size = local_settings.initial_window_size
 
-      if @local_window_size < (initial_window_size // 2)
+      if local_window_size < (initial_window_size // 2)
         increment = Math.min(initial_window_size * streams.active_count(1), MAXIMUM_WINDOW_SIZE)
         @local_window_size += increment
         streams.find(0).send_window_update(increment)
@@ -92,19 +82,10 @@ module Duo
         return 0 if window_size == 0
 
         actual = Math.min(size, window_size)
-        _, success = @remote_window_size.compare_and_set(window_size, window_size - actual)
-        return actual if success
-      end
-    end
-
-    private def increment_remote_window_size(increment) : Nil
-      if remote_window_size.to_i64 + increment > MAXIMUM_WINDOW_SIZE
-        raise Error.flow_control_error
-      end
-      @remote_window_size.add(increment)
-
-      if remote_window_size > 0
-        streams.each(&.resume_writeable)
+        if remote_window_size != window_size
+          remote_window_size = window_size - actual
+        end
+        return actual
       end
     end
   end

@@ -21,6 +21,10 @@ module Duo
     def state=(@state)
     end
 
+    def zero?
+      id.zero?
+    end
+
     def active? : Bool
       state.active?
     end
@@ -49,13 +53,32 @@ module Duo
       false
     end
 
-    def increment_remote_window_size(increment) : Nil
-      if @remote_window_size.to_i64 + increment > MAXIMUM_WINDOW_SIZE
+    def process_window_update(size) : Nil
+      return conn_window_update(size) if id.zero?
+      window_update(size)
+    end
+
+    def conn_window_update(size)
+      raise Error.flow_control_error if (remote_window_size.to_i64 + size) > MAXIMUM_WINDOW_SIZE
+      connection.remote_window_size + size
+      if remote_window_size > 0
+        connection.streams.each(&.resume_writeable)
+      end
+    end
+
+    def window_update(size)
+      if (remote_window_size.to_i64 + size) > MAXIMUM_WINDOW_SIZE
         send_rst_stream(Error::Code::FlowControlError)
         return
       end
-      @remote_window_size += increment
+      @remote_window_size += size
       resume_writeable
+    end
+
+    def send_rst_stream(error_code : Error::Code) : Nil
+      io = IO::Memory.new(RST_STREAM_FRAME_SIZE)
+      io.write_bytes(error_code.value.to_u32, IO::ByteFormat::BigEndian)
+      connection.send Frame.new(FrameType::RstStream, self, payload: io.to_slice)
     end
 
     def send_window_update(increment)
@@ -110,21 +133,6 @@ module Duo
       end
     end
 
-    # Writes data to the stream.
-    #
-    # This may be part of a request body (client context), or a response body
-    # (server context).
-    #
-    # This will send one or many Data frames, respecting SETTINGS_MAX_FRAME_SIZE
-    # as defined by the remote peer, as well as available window sizes for the
-    # stream and the connection, exhausting them as much as possible.
-    #
-    # This will block the current fiber if *data* is too big than allowed by any
-    # window size (stream or connection). The fiber will be eventually resumed
-    # when the remote peer sends a WindowUpdate frame to increment window
-    # sizes.
-    #
-    # Eventually returns when *data* has been fully sent.
     def send_data(data : String, flags : Frame::Flags = Frame::Flags::None) : Nil
       send_data(data.to_slice, flags)
     end
@@ -146,11 +154,11 @@ module Duo
       end
 
       until data.size == 0
-        if @remote_window_size < 1 || connection.remote_window_size < 1
+        if remote_window_size < 1 || connection.remote_window_size < 1
           wait_writeable
         end
 
-        size = {data.size, @remote_window_size, connection.remote_settings.max_frame_size}.min
+        size = {data.size, remote_window_size, connection.remote_settings.max_frame_size}.min
         if size > 0
           actual = connection.consume_remote_window_size(size)
 
@@ -164,14 +172,10 @@ module Duo
           end
         end
 
-        # allow other fibers to do their job (e.g. let the connection send or
-        # receive frames, let other streams send data, ...)
         Fiber.yield
       end
     end
 
-    # Block current fiber until the stream can send data. I.e. it's window size
-    # or the connection window size have been increased.
     private def wait_writeable
       @fiber = Fiber.current
       Crystal::Scheduler.reschedule
@@ -179,24 +183,11 @@ module Duo
       @fiber = nil
     end
 
-    # Resume a previously paused fiber waiting to send data, if any.
     def resume_writeable
-      if (fiber = @fiber) && @remote_window_size > 0
+      if (fiber = @fiber) && remote_window_size > 0
         Crystal::Scheduler.enqueue(Fiber.current)
         fiber.resume
       end
-    end
-
-    # Closes the stream. Optionally reporting an error status.
-    def send_rst_stream(error_code : Error::Code) : Nil
-      io = IO::Memory.new(RST_STREAM_FRAME_SIZE)
-      io.write_bytes(error_code.value.to_u32, IO::ByteFormat::BigEndian)
-      connection.send Frame.new(FrameType::RstStream, self, payload: io.to_slice)
-    end
-
-    # :nodoc:
-    def hash(hasher)
-      id.hash(hasher)
     end
   end
 end

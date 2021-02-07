@@ -22,7 +22,6 @@ module Duo
     protected getter encoder : HPACK::Encoder = HPack.encoder
     protected getter decoder : HPACK::Decoder = HPack.decoder
 
-    @closed = false
 
     def initialize(@io : IO, @type : Type)
       spawn receive_frame
@@ -104,16 +103,14 @@ module Duo
     end
 
     private def read_data_frame(frame)
-      raise Error.protocol_error if frame.stream.id == 0
+      raise Error.protocol_error if frame.stream.zero?
       stream = frame.stream
 
       read_padded(frame) do |size|
         update_local_window(size)
         stream.data.copy_from(io, size)
-
         if frame.flags.end_stream?
           stream.data.close_write
-
           if content_length = stream.headers["content-length"]?
             unless content_length.to_i == stream.data.size
               raise Error.protocol_error("MALFORMED data frame")
@@ -124,7 +121,7 @@ module Duo
     end
 
     private def read_headers_frame(frame)
-      raise Error.protocol_error if frame.stream.id == 0
+      raise Error.protocol_error if frame.stream.zero?
       stream = frame.stream
 
       read_padded(frame) do |size|
@@ -233,7 +230,6 @@ module Duo
           raise Error.protocol_error("EXPECTED continuation frame for stream ##{stream.id} not ##{frame.stream.id}")
         end
 
-        # FIXME: raise if the payload grows too big
         pointer = pointer.realloc(size + frame.size)
         io.read_fully((pointer + size).to_slice(frame.size))
 
@@ -244,7 +240,7 @@ module Duo
     end
 
     private def read_push_promise_frame(frame)
-      raise Error.protocol_error if frame.stream.id == 0
+      raise Error.protocol_error if frame.stream.zero?
       stream = frame.stream
 
       read_padded(frame) do |size|
@@ -257,7 +253,7 @@ module Duo
     end
 
     private def read_priority_frame(frame)
-      raise Error.protocol_error if frame.stream.id == 0
+      raise Error.protocol_error if frame.stream.zero?
       stream = frame.stream
       raise Error.frame_size_error unless frame.size == PRIORITY_FRAME_SIZE
 
@@ -269,13 +265,13 @@ module Duo
     end
 
     private def read_rst_stream_frame(frame)
-      raise Error.protocol_error if frame.stream.id == 0
+      raise Error.protocol_error if frame.stream.zero?
       raise Error.frame_size_error unless frame.size == RST_STREAM_FRAME_SIZE
       error_code = Error::Code.new(io.read_bytes(UInt32, IO::ByteFormat::BigEndian))
     end
 
     private def read_settings_frame(frame)
-      raise Error.protocol_error unless frame.stream.id == 0
+      raise Error.protocol_error unless frame.stream.zero?
       raise Error.frame_size_error unless frame.size % 6 == 0
       return if frame.flags.ack?
 
@@ -285,13 +281,10 @@ module Duo
           decoder.max_table_size = value
         when Settings::Identifier::InitialWindowSize
           difference = value - remote_settings.initial_window_size
-
-          # adjust windows size for all control-flow streams (doesn't affect
-          # the connection window size):
           unless difference == 0
             streams.each do |stream|
-              next if stream.id == 0
-              stream.increment_remote_window_size(difference)
+              next if stream.zero?
+              stream.process_window_update(difference)
             end
           end
         end
@@ -300,7 +293,7 @@ module Duo
     end
 
     private def read_ping_frame(frame)
-      raise Error.protocol_error unless frame.stream.id == 0
+      raise Error.protocol_error unless frame.stream.zero?
       raise Error.frame_size_error unless frame.size == PING_FRAME_SIZE
       buffer = uninitialized UInt8[8] # PING_FRAME_SIZE
       io.read_fully(buffer.to_slice)
@@ -330,31 +323,20 @@ module Duo
 
       raise Error.frame_size_error unless frame.size == WINDOW_UPDATE_FRAME_SIZE
       buf = io.read_bytes(UInt32, IO::ByteFormat::BigEndian)
-      # reserved = buf.bit(31)
       window_size_increment = (buf & 0x7fffffff_u32).to_i32
       raise Error.protocol_error unless MINIMUM_WINDOW_SIZE <= window_size_increment <= MAXIMUM_WINDOW_SIZE
-      if stream.id == 0
-        increment_remote_window_size(window_size_increment)
-      else
-        stream.increment_remote_window_size(window_size_increment)
-      end
+      stream.process_window_update(window_size_increment)
     end
 
     private def read_unsupported_frame(frame)
       frame.payload = Bytes.new(frame.size)
       io.read(frame.payload)
     end
-
-    # Immediately writes local settings to the connection.
-    #
-    # This is UNSAFE and MUST only be called for sending the initial Settings
-    # frame. Sending changes to `#local_settings` once the connection
-    # established MUST use `#send_settings` instead!
+    
     def write_settings : Nil
       write Frame.new(Duo::FrameType::Settings, streams.find(0), payload: local_settings.to_payload)
     end
 
-    # Sends a Settings frame for the current `#local_settings` values.
     def send_settings : Nil
       send Frame.new(Duo::FrameType::Settings, streams.find(0), payload: local_settings.to_payload)
     end
@@ -378,11 +360,6 @@ module Duo
       end
     end
 
-    # Terminates the HTTP/2 connection.
-    #
-    # This will send a GoAway frame if *notify* is true, reporting an
-    # `Error::Code` optional message if present to report an error, or
-    # `Error::Code::NoError` to terminate the connection cleanly.
     def close(error : Error = Error.no_error, notify : Bool = true)
       return if closed?
       @closed = true
