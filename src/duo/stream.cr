@@ -11,11 +11,11 @@ module Duo
     getter state : State
     property priority : Priority
     private getter connection : Connection
-    getter outbound_window_size : Int32
+    getter remote_window_size : Int32
     getter headers = HTTP::Headers.new
 
     def initialize(@connection, @id, @priority = DEFAULT_PRIORITY.dup, @state = State::Idle)
-      @outbound_window_size = connection.remote_settings.initial_window_size
+      @remote_window_size = connection.remote_settings.initial_window_size
     end
 
     def state=(@state)
@@ -49,20 +49,16 @@ module Duo
       false
     end
 
-    def increment_outbound_window_size(increment) : Nil
-      if @outbound_window_size.to_i64 + increment > MAXIMUM_WINDOW_SIZE
-        rst_stream(Error::Code::FlowControlError)
+    def increment_remote_window_size(increment) : Nil
+      if @remote_window_size.to_i64 + increment > MAXIMUM_WINDOW_SIZE
+        send_rst_stream(Error::Code::FlowControlError)
         return
       end
-      @outbound_window_size += increment
+      @remote_window_size += increment
       resume_writeable
     end
 
-    def consume_outbound_window_size(size)
-      @outbound_window_size -= size
-    end
-
-    def window_update(increment)
+    def send_window_update(increment)
       unless MINIMUM_WINDOW_SIZE <= increment <= MAXIMUM_WINDOW_SIZE
         raise Error.protocol_error("invalid WindowUpdate increment: #{increment}")
       end
@@ -71,35 +67,24 @@ module Duo
       connection.send Frame.new(FrameType::WindowUpdate, self, payload: io.to_slice)
     end
 
-    def priority : Nil
-      exclusive = priority.exclusive ? 0x80000000_u32 : 0_u32
-      dep_stream_id = priority.dep_stream_id.to_u32 & 0x7fffffff_u32
-
-      io = IO::Memory.new(PRIORITY_FRAME_SIZE)
-      io.write_bytes(exclusive | dep_stream_id, IO::ByteFormat::BigEndian)
-      io.write_byte((priority.weight - 1).to_u8)
-
-      connection.send Frame.new(FrameType::Priority, self, payload: io.to_slice)
+    def send_headers(headers : HTTP::Headers, flags : Frame::Flags = Frame::Flags::None) : Nil
+      payload = connection.encoder.encode(headers)
+      send_headers(FrameType::Headers, headers, flags, payload)
     end
 
-    def headers(headers : HTTP::Headers, flags : Frame::Flags = Frame::Flags::None) : Nil
-      payload = connection.hpack_encoder.encode(headers)
-      headers(FrameType::Headers, headers, flags, payload)
-    end
-
-    def push_promise(headers : HTTP::Headers, flags : Frame::Flags = Frame::Flags::None) : Stream?
+    def send_push_promise(headers : HTTP::Headers, flags : Frame::Flags = Frame::Flags::None) : Stream?
       unless connection.remote_settings.enable_push
         return
       end
       connection.streams.create(state: Stream::State::ReservedLocal).tap do |stream|
         io = IO::Memory.new
         io.write_bytes(stream.id.to_u32 & 0x7fffffff_u32, IO::ByteFormat::BigEndian)
-        payload = connection.hpack_encoder.encode(headers, writer: io)
-        headers(FrameType::PushPromise, headers, flags, payload)
+        payload = connection.encoder.encode(headers, writer: io)
+        send_headers(FrameType::PushPromise, headers, flags, payload)
       end
     end
 
-    def headers(type : FrameType, headers, flags, payload) : Nil
+    def send_headers(type : FrameType, headers, flags, payload) : Nil
       max_frame_size = connection.remote_settings.max_frame_size
 
       if payload.size <= max_frame_size
@@ -140,12 +125,12 @@ module Duo
     # sizes.
     #
     # Eventually returns when *data* has been fully sent.
-    def data(data : String, flags : Frame::Flags = Frame::Flags::None) : Nil
-      data(data.to_slice, flags)
+    def send_data(data : String, flags : Frame::Flags = Frame::Flags::None) : Nil
+      send_data(data.to_slice, flags)
     end
 
     # ditto
-    def data(data : Bytes, flags : Frame::Flags = Frame::Flags::None) : Nil
+    def send_data(data : Bytes, flags : Frame::Flags = Frame::Flags::None) : Nil
       if flags.end_stream? && data.size > 0
         end_stream = true
         flags ^= Frame::Flags::EndStream
@@ -161,18 +146,17 @@ module Duo
       end
 
       until data.size == 0
-        if @outbound_window_size < 1 || connection.outbound_window_size < 1
+        if @remote_window_size < 1 || connection.remote_window_size < 1
           wait_writeable
         end
 
-        size = {data.size, @outbound_window_size, connection.remote_settings.max_frame_size}.min
+        size = {data.size, @remote_window_size, connection.remote_settings.max_frame_size}.min
         if size > 0
-          actual = connection.consume_outbound_window_size(size)
+          actual = connection.consume_remote_window_size(size)
 
           if actual > 0
             frame.payload = data[0, actual]
-
-            consume_outbound_window_size(actual)
+            @remote_window_size -= actual
             data += actual
 
             frame.flags |= Frame::Flags::EndStream if data.size == 0 && end_stream
@@ -197,25 +181,17 @@ module Duo
 
     # Resume a previously paused fiber waiting to send data, if any.
     def resume_writeable
-      if (fiber = @fiber) && @outbound_window_size > 0
+      if (fiber = @fiber) && @remote_window_size > 0
         Crystal::Scheduler.enqueue(Fiber.current)
         fiber.resume
       end
     end
 
     # Closes the stream. Optionally reporting an error status.
-    def rst_stream(error_code : Error::Code) : Nil
+    def send_rst_stream(error_code : Error::Code) : Nil
       io = IO::Memory.new(RST_STREAM_FRAME_SIZE)
       io.write_bytes(error_code.value.to_u32, IO::ByteFormat::BigEndian)
       connection.send Frame.new(FrameType::RstStream, self, payload: io.to_slice)
-    end
-
-    def receiving(frame : Frame)
-      state.transition(frame, receiving: true)
-    end
-
-    def sending(frame : Frame)
-      state.transition(frame, receiving: false)
     end
 
     # :nodoc:

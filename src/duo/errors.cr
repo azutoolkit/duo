@@ -17,6 +17,12 @@ module Duo
       Http11Required     = 0xd
     end
 
+    {% for code in Code.constants %}
+      def self.{{ code.underscore }}(message = "")
+        new Code::{{ code.id }}, 0, message
+      end
+    {% end %}
+
     getter code : Code
     getter last_stream_id : UInt32
 
@@ -24,12 +30,6 @@ module Duo
       @last_stream_id = last_stream_id.to_u32
       super(message)
     end
-
-    {% for code in Code.constants %}
-      def self.{{ code.underscore }}(message = "")
-        new Code::{{ code.id }}, 0, message
-      end
-    {% end %}
   end
 
   class ClientError < Error

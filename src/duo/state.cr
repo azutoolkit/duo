@@ -8,6 +8,16 @@ module Duo
     HalfClosedRemote
     Closed
 
+    def self.receiving(frame : Frame)
+      state = frame.stream.state
+      state.transition(frame, receiving: true)
+    end
+
+    def self.sending(frame : Frame)
+      state = frame.stream.state
+      state.transition(frame, receiving: false)
+    end
+
     def active?
       open? || half_closed_local? || half_closed_remote?
     end
@@ -82,7 +92,7 @@ module Duo
           if receiving
             raise Error.stream_closed
           else
-            frame.stream.rst_stream(Error::Code::InternalError)
+            frame.stream.send_rst_stream(Error::Code::InternalError)
           end
         end
       end

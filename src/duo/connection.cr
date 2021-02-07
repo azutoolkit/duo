@@ -4,32 +4,28 @@ require "./errors"
 require "./frame"
 require "./settings"
 require "./streams"
-require "./emittable"
+require "./flow_control"
 
 module Duo
   class Connection
-    include Emittable
+    include FlowControl
 
     enum Type
-      CLIENT
-      SERVER
+      Client
+      Server
     end
 
     private getter io : IO
     private ACK = Frame::Flags::EndStream
     getter local_settings : Settings = Settings::DEFAULT.dup
     getter remote_settings : Settings = Settings.new
-    protected getter hpack_encoder : HPACK::Encoder
-    protected getter hpack_decoder : HPACK::Decoder
+    protected getter encoder : HPACK::Encoder = HPack.encoder
+    protected getter decoder : HPACK::Decoder = HPack.decoder
 
     @closed = false
-    @hpack_encoder = HPack.encoder
-    @hpack_decoder = HPack.decoder
-    @inbound_window_size = DEFAULT_INITIAL_WINDOW_SIZE
-    @outbound_window_size = Atomic(Int32).new(DEFAULT_INITIAL_WINDOW_SIZE)
 
     def initialize(@io : IO, @type : Type)
-      spawn frame_writer
+      spawn receive_frame
     end
 
     # Holds streams associated to the connection. Can be used to find an
@@ -66,40 +62,6 @@ module Duo
     def write_client_preface : Nil
       raise "can't write HTTP/2 client preface on a server connection" unless @type.client?
       io << CLIENT_PREFACE
-    end
-
-    # Call in the main loop to receive individual frames.
-    #
-    # Most frames are already being taken care of, so only Headers, Data or
-    # PushPromise frames should really be interesting. Other frames can be
-    # ignored safely.
-    #
-    # Unknown frame types are reported with a raw `Frame#payload`, so a client
-    # or server may handle them (e.g. custom extensions). They can be safely
-    # ignored.
-    def receive : Frame?
-      frame = read_frame_header
-      stream = frame.stream
-
-      stream.receiving(frame)
-
-      case frame.type
-      when FrameType::Data         then read_data_frame(frame)
-      when FrameType::Headers      then read_headers_frame(frame)
-      when FrameType::PushPromise  then read_push_promise_frame(frame)
-      when FrameType::Priority     then read_priority_frame(frame)
-      when FrameType::RstStream    then read_rst_stream_frame(frame)
-      when FrameType::Settings     then read_settings_frame(frame)
-      when FrameType::Ping         then read_ping_frame(frame)
-      when FrameType::GoAway       then read_goaway_frame(frame)
-      when FrameType::WindowUpdate then read_window_update_frame(frame)
-      when FrameType::Continuation
-        raise Error.protocol_error("UNEXPECTED Continuation frame")
-      else
-        read_unsupported_frame(frame)
-      end
-
-      frame
     end
 
     # Reads padding information and yields the actual frame size without the
@@ -146,7 +108,7 @@ module Duo
       stream = frame.stream
 
       read_padded(frame) do |size|
-        consume_inbound_window_size(size)
+        update_local_window(size)
         stream.data.copy_from(io, size)
 
         if frame.flags.end_stream?
@@ -154,7 +116,6 @@ module Duo
 
           if content_length = stream.headers["content-length"]?
             unless content_length.to_i == stream.data.size
-              # stream.send_rst_stream(Error::Code::ProtocolError)
               raise Error.protocol_error("MALFORMED data frame")
             end
           end
@@ -183,9 +144,9 @@ module Duo
 
         begin
           if stream.data?
-            hpack_decoder.decode(buffer, stream.trailing_headers)
+            decoder.decode(buffer, stream.trailing_headers)
           else
-            hpack_decoder.decode(buffer, stream.headers)
+            decoder.decode(buffer, stream.headers)
             if @type.server?
               validate_request_headers(stream.headers)
             else
@@ -288,9 +249,10 @@ module Duo
 
       read_padded(frame) do |size|
         _, promised_stream_id = read_stream_id
-        streams.find(promised_stream_id).receiving(frame)
+        stream = streams.find(promised_stream_id)
+        stream.state.transition(frame, receiving: true)
         buffer = read_headers_payload(frame, size - 4)
-        hpack_decoder.decode(buffer, stream.headers)
+        decoder.decode(buffer, stream.headers)
       end
     end
 
@@ -320,7 +282,7 @@ module Duo
       remote_settings.parse(io, frame.size // 6) do |id, value|
         case id
         when Settings::Identifier::HeaderTableSize
-          hpack_decoder.max_table_size = value
+          decoder.max_table_size = value
         when Settings::Identifier::InitialWindowSize
           difference = value - remote_settings.initial_window_size
 
@@ -329,7 +291,7 @@ module Duo
           unless difference == 0
             streams.each do |stream|
               next if stream.id == 0
-              stream.increment_outbound_window_size(difference)
+              stream.increment_remote_window_size(difference)
             end
           end
         end
@@ -372,9 +334,9 @@ module Duo
       window_size_increment = (buf & 0x7fffffff_u32).to_i32
       raise Error.protocol_error unless MINIMUM_WINDOW_SIZE <= window_size_increment <= MAXIMUM_WINDOW_SIZE
       if stream.id == 0
-        increment_outbound_window_size(window_size_increment)
+        increment_remote_window_size(window_size_increment)
       else
-        stream.increment_outbound_window_size(window_size_increment)
+        stream.increment_remote_window_size(window_size_increment)
       end
     end
 
@@ -401,7 +363,7 @@ module Duo
       size = frame.payload?.try(&.size.to_u32) || 0_u32
       stream = frame.stream
 
-      stream.sending(frame) unless frame.type == FrameType::PushPromise
+      State.sending(frame) unless frame.type == FrameType::PushPromise
 
       io.write_bytes((size << 8) | frame.type.to_u8, IO::ByteFormat::BigEndian)
       io.write_byte(frame.flags.to_u8)
@@ -416,74 +378,24 @@ module Duo
       end
     end
 
-    # Keeps the inbound window size (when receiving Data frames). If the
-    # available size shrinks below half the initial window size, then we send a
-    # WindowUpdate frame to increment it by the initial window size * the
-    # number of active streams, respecting `MAXIMUM_WINDOW_SIZE`.
-    private def consume_inbound_window_size(len)
-      @inbound_window_size -= len
-      initial_window_size = local_settings.initial_window_size
-
-      if @inbound_window_size < (initial_window_size // 2)
-        # if @inbound_window_size <= 0
-        increment = Math.min(initial_window_size * streams.active_count(1), MAXIMUM_WINDOW_SIZE)
-        @inbound_window_size += increment
-        streams.find(0).window_update(increment)
-      end
-    end
-
-    protected def outbound_window_size
-      @outbound_window_size.get
-    end
-
-    # Tries to consume *len* bytes from the connection outbound window size, but
-    # may return a lower value, or even 0.
-    protected def consume_outbound_window_size(len)
-      loop do
-        window_size = @outbound_window_size.get
-        return 0 if window_size == 0
-
-        actual = Math.min(len, window_size)
-        _, success = @outbound_window_size.compare_and_set(window_size, window_size - actual)
-        return actual if success
-      end
-    end
-
-    # Increments the connection outbound window size.
-    private def increment_outbound_window_size(increment) : Nil
-      if outbound_window_size.to_i64 + increment > MAXIMUM_WINDOW_SIZE
-        raise Error.flow_control_error
-      end
-      @outbound_window_size.add(increment)
-
-      if outbound_window_size > 0
-        streams.each(&.resume_writeable)
-      end
-    end
-
     # Terminates the HTTP/2 connection.
     #
     # This will send a GoAway frame if *notify* is true, reporting an
     # `Error::Code` optional message if present to report an error, or
     # `Error::Code::NoError` to terminate the connection cleanly.
-    def close(error : Error? = nil, notify : Bool = true)
+    def close(error : Error = Error.no_error, notify : Bool = true)
       return if closed?
       @closed = true
 
       unless io.closed?
         if notify
-          if error
-            message, code = error.message || "", error.code
-          else
-            message, code = "", Error::Code::NoError
-          end
+          message = error.message || ""
+          code = error.code
           payload = IO::Memory.new(8 + message.bytesize)
           payload.write_bytes(streams.last_stream_id.to_u32, IO::ByteFormat::BigEndian)
           payload.write_bytes(code.to_u32, IO::ByteFormat::BigEndian)
           payload << message
-
-          # FIXME: shouldn't write directly to IO
-          write Frame.new(FrameType::GoAway, streams.find(0), payload: payload.to_slice)
+          send Frame.new(FrameType::GoAway, streams.find(0), payload: payload.to_slice)
         end
       end
 

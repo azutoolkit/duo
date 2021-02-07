@@ -41,7 +41,7 @@ module Duo
         # if @inbound_window_size <= increment
         if @inbound_window_size <= 0
           @inbound_window_size += increment
-          @stream.window_update(increment)
+          @stream.send_window_update(increment)
         end
       end
 

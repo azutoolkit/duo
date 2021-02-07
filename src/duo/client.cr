@@ -26,11 +26,11 @@ module Duo
         @scheme = "http"
       end
 
-      connection = Connection.new(io, Connection::Type::CLIENT)
+      connection = Connection.new(io, Connection::Type::Client)
       connection.write_client_preface
       connection.write_settings
 
-      frame = connection.receive
+      frame = connection.process_frame
       unless frame.try(&.type) == FrameType::Settings
         raise Error.protocol_error("Expected Settings frame")
       end
@@ -41,7 +41,7 @@ module Duo
 
     private def handle_connection
       loop do
-        unless frame = @connection.receive
+        unless frame = @connection.process_frame
           next
         end
         case frame.type

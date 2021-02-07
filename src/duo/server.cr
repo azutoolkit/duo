@@ -145,7 +145,7 @@ module Duo
     end
 
     private def handle_http2_connection(io, request = nil, settings = nil, alpn = nil) : Nil
-      connection = Connection.new(io, Connection::Type::SERVER)
+      connection = Connection.new(io, Connection::Type::Server)
 
       if settings
         # HTTP/1 => HTTP/2 upgrade: we got settings
@@ -156,7 +156,7 @@ module Duo
       connection.read_client_preface(truncated: alpn.nil?)
       connection.write_settings
 
-      frame = connection.receive
+      frame = connection.process_frame
       unless frame.try(&.type) == FrameType::Settings
         raise Error.protocol_error("Expected Settings frame")
       end
@@ -169,7 +169,7 @@ module Duo
       end
 
       loop do
-        unless frame = connection.receive
+        unless frame = connection.process_frame
           next
         end
 
@@ -190,13 +190,9 @@ module Duo
     rescue ex : Duo::ClientError
       Log.error(exception: ex) { "RECV: #{ex.code}: #{ex.message}" }
     rescue ex : Duo::Error
-      if connection
-        connection.close(error: ex) unless connection.closed?
-      end
+      connection.close(error: ex) if connection
     ensure
-      if connection
-        connection.close unless connection.closed?
-      end
+      connection.close if connection
     end
 
     private def context_for(stream : Stream, request = nil)
