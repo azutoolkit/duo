@@ -44,10 +44,12 @@ module Duo
     def read_client_preface(truncated = false) : Nil
       raise "can't read HTTP/2 client preface on a client connection" unless @type.server?
       if truncated
-        buf1 = uninitialized UInt8[8]; buffer = buf1.to_slice
+        buf1 = uninitialized UInt8[8]
+        buffer = buf1.to_slice
         preface = CLIENT_PREFACE[-8, 8]
       else
-        buf2 = uninitialized UInt8[24]; buffer = buf2.to_slice
+        buf2 = uninitialized UInt8[24]
+        buffer = buf2.to_slice
         preface = CLIENT_PREFACE
       end
       io.read_fully(buffer.to_slice)
@@ -80,26 +82,6 @@ module Duo
       if pad_size
         io.skip(pad_size)
       end
-    end
-
-    private def read_frame_header
-      buf = io.read_bytes(UInt32, IO::ByteFormat::BigEndian)
-      size, type = (buf >> 8).to_i, buf & 0xff
-
-      flags = Frame::Flags.new(read_byte)
-      _, stream_id = read_stream_id
-
-      if size > remote_settings.max_frame_size
-        raise Error.frame_size_error
-      end
-
-      frame_type = FrameType.new(type.to_i)
-      unless frame_type.priority? || streams.valid?(stream_id)
-        raise Error.protocol_error("INVALID stream_id ##{stream_id}")
-      end
-
-      stream = streams.find(stream_id, consume: !frame_type.priority?)
-      Frame.new(frame_type, stream, flags, size: size)
     end
 
     private def read_data_frame(frame)
@@ -166,6 +148,26 @@ module Duo
       end
     end
 
+    private def read_frame_header
+      buf = io.read_bytes(UInt32, IO::ByteFormat::BigEndian)
+      size, type = (buf >> 8).to_i, buf & 0xff
+
+      flags = Frame::Flags.new(read_byte)
+      _, stream_id = read_stream_id
+
+      if size > remote_settings.max_frame_size
+        raise Error.frame_size_error
+      end
+
+      frame_type = FrameType.new(type.to_i)
+      unless frame_type.priority? || streams.valid?(stream_id)
+        raise Error.protocol_error("INVALID stream_id ##{stream_id}")
+      end
+
+      stream = streams.find(stream_id, consume: !frame_type.priority?)
+      Frame.new(frame_type, stream, flags, size: size)
+    end
+
     private def validate_request_headers(headers : HTTP::Headers) : Nil
       validate_headers(headers, REQUEST_PSEUDO_HEADERS)
 
@@ -223,7 +225,7 @@ module Duo
         break if frame.flags.end_headers?
 
         frame = read_frame_header
-        unless frame.type == FrameType::Continuation
+        unless frame.type.continuation?
           raise Error.protocol_error("EXPECTED continuation frame")
         end
         unless frame.stream == stream
@@ -345,7 +347,7 @@ module Duo
       size = frame.payload?.try(&.size.to_u32) || 0_u32
       stream = frame.stream
 
-      State.sending(frame) unless frame.type == FrameType::PushPromise
+      State.sending(frame) unless frame.type.push_promise?
 
       io.write_bytes((size << 8) | frame.type.to_u8, IO::ByteFormat::BigEndian)
       io.write_byte(frame.flags.to_u8)

@@ -38,10 +38,6 @@ module Duo
         end
       end
 
-      # if ENV["HTTP_DUMP"]?
-      #   io = IO::Hexdump.new(io, read: true)
-      # end
-
       connection = HTTP1::Connection.new(io)
 
       loop do
@@ -95,8 +91,6 @@ module Duo
     ensure
       begin
         io.close if must_close
-        # rescue ex : Errno
-        #  raise ex unless {Errno::EPIPE, Errno::ECONNRESET}.includes?(ex.errno)
       rescue IO::EOFError | IO::Error
       end
     end
@@ -109,8 +103,6 @@ module Duo
         body = Compress::Gzip::Reader.new(body, sync_close: true)
       when "deflate"
         body = Compress::Deflate::Reader.new(body, sync_close: true)
-      else
-        # shut up, crystal
       end
 
       check_content_type_charset(body, headers)
@@ -148,7 +140,6 @@ module Duo
       connection = Connection.new(io, Connection::Type::Server)
 
       if settings
-        # HTTP/1 => HTTP/2 upgrade: we got settings
         connection.remote_settings.parse(settings) do |setting, value|
         end
       end
@@ -162,7 +153,6 @@ module Duo
       end
 
       if request
-        # HTTP/1 => HTTP/2 upgrade: reply to HTTP/1 request on stream #1 of HTTP/2
         stream = connection.streams.find(1)
         context = context_for(stream, request)
         spawn handle_request(context.as(Context))
@@ -175,7 +165,6 @@ module Duo
 
         case frame.type
         when FrameType::Headers
-          # don't dispatch twice
           next if frame.stream.trailing_headers?
           context = context_for(frame.stream)
           spawn handle_request(context.as(Context))
@@ -183,8 +172,6 @@ module Duo
           raise Error.protocol_error("Unexpected PushPromise frame")
         when FrameType::GoAway
           break
-        else
-          # shut up, crystal
         end
       end
     rescue ex : Duo::ClientError
