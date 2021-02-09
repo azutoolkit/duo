@@ -40,16 +40,16 @@ module Duo
         error!(receiving) if receiving
 
         case frame.type
-        when FrameType::Headers then stream.state = HalfClosedLocal
+        when FrameType::Headers   then stream.state = HalfClosedLocal
         when FrameType::RstStream then stream.state = Closed
-        else error!(receiving)
+        else                           error!(receiving)
         end
       when ReservedRemote
         error!(receiving) unless receiving
         case frame.type
-        when FrameType::Headers then stream.state = HalfClosedRemote
+        when FrameType::Headers   then stream.state = HalfClosedRemote
         when FrameType::RstStream then stream.state = Closed
-        else error!(receiving)
+        else                           error!(receiving)
         end
       when Open
         case frame.type

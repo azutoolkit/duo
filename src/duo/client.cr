@@ -30,7 +30,7 @@ module Duo
       connection.write_client_preface
       connection.write_settings
 
-      frame = connection.process_frame
+      frame = connection.call
       unless frame.try(&.type) == FrameType::Settings
         raise Error.protocol_error("Expected Settings frame")
       end
@@ -41,7 +41,7 @@ module Duo
 
     private def handle_connection
       loop do
-        unless frame = @connection.process_frame
+        unless frame = @connection.call
           next
         end
         case frame.type

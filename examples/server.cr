@@ -27,10 +27,6 @@ ssl_context.certificate_chain = File.join(__DIR__, "ssl", "example.crt")
 ssl_context.private_key = File.join(__DIR__, "ssl", "example.key")
 ssl_context.alpn_protocol = "h2"
 
-unless ENV["CI"]?
-  Duo::Log.level = Log::Severity::Debug
-end
-
 host = ENV["HOST"]? || "::"
 port = (ENV["PORT"]? || 9876).to_i
 

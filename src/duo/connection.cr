@@ -4,43 +4,100 @@ require "./errors"
 require "./frame"
 require "./settings"
 require "./streams"
-require "./flow_control"
 
 module Duo
   class Connection
-    include FlowControl
-
     enum Type
       Client
       Server
     end
 
-    private getter io : IO
     private ACK = Frame::Flags::EndStream
+    private getter io : IO
+
+    getter closed = false
     getter local_settings : Settings = Settings::DEFAULT.dup
     getter remote_settings : Settings = Settings.new
-    protected getter encoder : HPACK::Encoder = HPack.encoder
-    protected getter decoder : HPACK::Decoder = HPack.decoder
-
+    getter remote_window_size = DEFAULT_INITIAL_WINDOW_SIZE
+    getter local_window_size = DEFAULT_INITIAL_WINDOW_SIZE
+    getter channel : Channel(Frame | Array(Frame) | Nil) = Channel(Frame | Array(Frame) | Nil).new(10)
+    getter encoder : HPACK::Encoder = HPack.encoder
+    getter decoder : HPACK::Decoder = HPack.decoder
 
     def initialize(@io : IO, @type : Type)
-      spawn receive_frame
+      spawn listen
     end
 
-    # Holds streams associated to the connection. Can be used to find an
-    # existing stream or create a new stream —odd numbered for client requests,
-    # even numbered for server pushed requests.
-    def streams : Streams
-      # FIXME: thread safety?
-      #        can't be in #initialize because of self reference
-      @streams ||= Streams.new(self, @type)
+    def streams 
+      @streams ||= Streams.new self, @type
+    end
+    
+    def receive
+      channel.receive
     end
 
-    # Reads the expected `Duo::CLIENT_PREFACE` for a server context.
-    #
-    # You may set *truncated* to true if the request line was already read, for
-    # example when trying to figure out whether the request was a HTTP/1 or
-    # HTTP/2 direct request, where `"PRI * HTTP/2.0\r\n"` was already consumed.
+    def empty?
+      @channel.@queue.not_nil!
+    end
+
+    def send(frame : Frame)
+      @channel.send(frame) unless @channel.closed?
+    end
+
+    def send(frame : Array(Frame))
+      @channel.send(frame) unless @channel.closed?
+    end
+
+    def close_channel!
+      unless @channel.closed?
+        @channel.send(nil)
+        @channel.close
+      end
+    end
+
+    def listen
+      loop do
+        begin
+          case frame = receive
+          when Array(Frame) then frame.each { |f| write(f, flush: false) }
+          when Frame        then write(frame, flush: false)
+          else
+            io.close unless io.closed?
+            break
+          end
+        rescue Channel::ClosedError
+          break
+        ensure
+          io.flush if empty?
+        end
+      end
+    end
+
+    def call
+      frame = read_frame_header
+      stream = frame.stream
+
+      State.receiving(frame)
+
+      case frame.type
+      when FrameType::Data         then read_data_frame(frame)
+      when FrameType::Headers      then read_headers_frame(frame)
+      when FrameType::PushPromise  then read_push_promise_frame(frame)
+      when FrameType::Priority     then read_priority_frame(frame)
+      when FrameType::RstStream    then read_rst_stream_frame(frame)
+      when FrameType::Settings     then read_settings_frame(frame)
+      when FrameType::Ping         then read_ping_frame(frame)
+      when FrameType::GoAway       then read_goaway_frame(frame)
+      when FrameType::WindowUpdate then read_window_update_frame(frame)
+      when FrameType::Continuation
+        raise Error.protocol_error("UNEXPECTED Continuation frame")
+      else
+        read_unsupported_frame(frame)
+      end
+
+      frame
+    end
+
     def read_client_preface(truncated = false) : Nil
       raise "can't read HTTP/2 client preface on a client connection" unless @type.server?
       if truncated
@@ -58,15 +115,11 @@ module Duo
       end
     end
 
-    # Writes the `Duo::CLIENT_PREFACE` to initialize an HTTP/2 client
-    # connection.
-    def write_client_preface : Nil
+    def write_client_preface
       raise "can't write HTTP/2 client preface on a server connection" unless @type.client?
       io << CLIENT_PREFACE
     end
 
-    # Reads padding information and yields the actual frame size without the
-    # padding size. Eventually skips the padding.
     private def read_padded(frame)
       size = frame.size
 
@@ -212,9 +265,17 @@ module Duo
       end
     end
 
-    # OPTIMIZE: consider IO::CircularBuffer and decompressing HPACK headers
-    # in-parallel instead of reallocating pointers and eventually
-    # decompressing everything
+    def update_local_window(size)
+      @local_window_size -= size
+      initial_window_size = local_window_size
+
+      if local_window_size < (initial_window_size // 2)
+        increment = Math.min(initial_window_size * streams.active_count(1), MAXIMUM_WINDOW_SIZE)
+        @local_window_size += increment
+        streams.find(0).send_window_update(increment)
+      end
+    end
+
     private def read_headers_payload(frame, size)
       stream = frame.stream
 
@@ -334,7 +395,7 @@ module Duo
       frame.payload = Bytes.new(frame.size)
       io.read(frame.payload)
     end
-    
+
     def write_settings : Nil
       write Frame.new(Duo::FrameType::Settings, streams.find(0), payload: local_settings.to_payload)
     end

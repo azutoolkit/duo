@@ -147,7 +147,7 @@ module Duo
       connection.read_client_preface(truncated: alpn.nil?)
       connection.write_settings
 
-      frame = connection.process_frame
+      frame = connection.call
       unless frame.try(&.type) == FrameType::Settings
         raise Error.protocol_error("Expected Settings frame")
       end
@@ -159,7 +159,7 @@ module Duo
       end
 
       loop do
-        unless frame = connection.process_frame
+        unless frame = connection.call
           next
         end
 

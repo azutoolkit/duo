@@ -1,4 +1,4 @@
-# duo
+# DUO
 
 TODO: Write a description here
 
@@ -9,7 +9,7 @@ TODO: Write a description here
    ```yaml
    dependencies:
      duo:
-       github: your-github-user/duo
+       github: eliasjpr/duo
    ```
 
 2. Run `shards install`
@@ -28,7 +28,7 @@ TODO: Write development instructions here
 
 ## Contributing
 
-1. Fork it (<https://github.com/your-github-user/duo/fork>)
+1. Fork it (<https://github.com/eliasjpr/duo/fork>)
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
@@ -36,4 +36,4 @@ TODO: Write development instructions here
 
 ## Contributors
 
-- [Elias J. Perez](https://github.com/your-github-user) - creator and maintainer
+- [Elias J. Perez](https://github.com/eliasjpr) - creator and maintainer
