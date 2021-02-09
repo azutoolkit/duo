@@ -28,10 +28,10 @@ module Duo
       spawn listen
     end
 
-    def streams 
+    def streams
       @streams ||= Streams.new self, @type
     end
-    
+
     def receive
       channel.receive
     end
@@ -98,7 +98,7 @@ module Duo
       frame
     end
 
-    def read_client_preface(truncated = false) : Nil
+    def read_client_preface(truncated = false)
       raise "can't read HTTP/2 client preface on a client connection" unless @type.server?
       if truncated
         buf1 = uninitialized UInt8[8]
@@ -221,7 +221,7 @@ module Duo
       Frame.new(frame_type, stream, flags, size: size)
     end
 
-    private def validate_request_headers(headers : HTTP::Headers) : Nil
+    private def validate_request_headers(headers : HTTP::Headers)
       validate_headers(headers, REQUEST_PSEUDO_HEADERS)
 
       unless headers.get?(":method").try(&.size) == 1
@@ -240,11 +240,11 @@ module Duo
       end
     end
 
-    private def validate_response_headers(headers : HTTP::Headers) : Nil
+    private def validate_response_headers(headers : HTTP::Headers)
       validate_headers(headers, RESPONSE_PSEUDO_HEADERS)
     end
 
-    private def validate_headers(headers : HTTP::Headers, pseudo : Array(String)) : Nil
+    private def validate_headers(headers : HTTP::Headers, pseudo : Array(String))
       regular = false
 
       headers.each_key do |name|
@@ -358,7 +358,7 @@ module Duo
     private def read_ping_frame(frame)
       raise Error.protocol_error unless frame.stream.zero?
       raise Error.frame_size_error unless frame.size == PING_FRAME_SIZE
-      buffer = uninitialized UInt8[8] # PING_FRAME_SIZE
+      buffer = uninitialized UInt8[8]
       io.read_fully(buffer.to_slice)
 
       unless frame.flags.ack?
@@ -396,11 +396,11 @@ module Duo
       io.read(frame.payload)
     end
 
-    def write_settings : Nil
+    def write_settings
       write Frame.new(Duo::FrameType::Settings, streams.find(0), payload: local_settings.to_payload)
     end
 
-    def send_settings : Nil
+    def send_settings
       send Frame.new(Duo::FrameType::Settings, streams.find(0), payload: local_settings.to_payload)
     end
 
@@ -419,7 +419,7 @@ module Duo
       end
 
       if flush
-        io.flush # unless io.sync?
+        io.flush
       end
     end
 

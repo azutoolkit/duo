@@ -3,7 +3,7 @@ require "./stream"
 module Duo
   class Streams
     @max_concurrent_streams : Int32
-    # :nodoc:
+
     protected def initialize(@connection : Connection, type : Connection::Type)
       @max_concurrent_streams = @connection.remote_settings.max_concurrent_streams
       @streams = {} of Int32 => Stream
