@@ -15,17 +15,20 @@ module Duo
     private ACK = Frame::Flags::EndStream
     private getter io : IO
 
-    getter closed = false
+    getter? closed = false
     getter local_settings : Settings = Settings::DEFAULT.dup
     getter remote_settings : Settings = Settings.new
-    getter remote_window_size = DEFAULT_INITIAL_WINDOW_SIZE
     getter local_window_size = DEFAULT_INITIAL_WINDOW_SIZE
-    getter channel : Channel(Frame | Array(Frame) | Nil) = Channel(Frame | Array(Frame) | Nil).new(10)
+    getter channel : Channel(Frame | Array(Frame) | Nil) = Channel(Frame | Array(Frame) | Nil).new(32)
     getter encoder : HPACK::Encoder = HPack.encoder
     getter decoder : HPACK::Decoder = HPack.decoder
 
     def initialize(@io : IO, @type : Type)
       spawn listen
+    end
+
+    private def read_byte
+      io.read_byte.not_nil!
     end
 
     def streams
@@ -48,28 +51,10 @@ module Duo
       @channel.send(frame) unless @channel.closed?
     end
 
-    def close_channel!
+    private def close_channel!
       unless @channel.closed?
         @channel.send(nil)
         @channel.close
-      end
-    end
-
-    def listen
-      loop do
-        begin
-          case frame = receive
-          when Array(Frame) then frame.each { |f| write(f, flush: false) }
-          when Frame        then write(frame, flush: false)
-          else
-            io.close unless io.closed?
-            break
-          end
-        rescue Channel::ClosedError
-          break
-        ensure
-          io.flush if empty?
-        end
       end
     end
 
@@ -98,7 +83,34 @@ module Duo
       frame
     end
 
-    def read_client_preface(truncated = false)
+    def write_client_preface
+      raise "can't write HTTP/2 client preface on a server connection" unless @type.client?
+      io << CLIENT_PREFACE
+    end
+
+    def write_settings
+      write Frame.new(Duo::FrameType::Settings, streams.find(0), payload: local_settings.to_payload)
+    end
+
+    private def listen
+      loop do
+        begin
+          case frame = receive
+          when Array(Frame) then frame.each { |f| write(f, flush: false) }
+          when Frame        then write(frame, flush: false)
+          else
+            io.close unless io.closed?
+            break
+          end
+        rescue Channel::ClosedError
+          break
+        ensure
+          io.flush if empty?
+        end
+      end
+    end
+
+    def self.client_preface(io, truncated = false)
       raise "can't read HTTP/2 client preface on a client connection" unless @type.server?
       if truncated
         buf1 = uninitialized UInt8[8]
@@ -113,11 +125,6 @@ module Duo
       unless String.new(buffer.to_slice) == preface
         raise Error.protocol_error("PREFACE expected")
       end
-    end
-
-    def write_client_preface
-      raise "can't write HTTP/2 client preface on a server connection" unless @type.client?
-      io << CLIENT_PREFACE
     end
 
     private def read_padded(frame)
@@ -265,7 +272,7 @@ module Duo
       end
     end
 
-    def update_local_window(size)
+    private def update_local_window(size)
       @local_window_size -= size
       initial_window_size = local_window_size
 
@@ -395,15 +402,6 @@ module Duo
       frame.payload = Bytes.new(frame.size)
       io.read(frame.payload)
     end
-
-    def write_settings
-      write Frame.new(Duo::FrameType::Settings, streams.find(0), payload: local_settings.to_payload)
-    end
-
-    def send_settings
-      send Frame.new(Duo::FrameType::Settings, streams.find(0), payload: local_settings.to_payload)
-    end
-
     private def write(frame : Frame, flush = true)
       size = frame.payload?.try(&.size.to_u32) || 0_u32
       stream = frame.stream
@@ -440,14 +438,6 @@ module Duo
       end
 
       close_channel!
-    end
-
-    def closed?
-      @closed
-    end
-
-    private def read_byte
-      io.read_byte.not_nil!
     end
 
     private def read_stream_id

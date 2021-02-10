@@ -1,7 +1,5 @@
 module Duo
   class Frame
-    # See https://tools.ietf.org/html/rfc7540#section-11.2
-
     @[Flags]
     enum Flags : UInt8
       EndStream  =  0x1_u8
@@ -48,12 +46,10 @@ module Duo
 
     @size : Int32?
 
-    # :nodoc:
     protected def initialize(@type : FrameType, @stream : Stream, @flags : Flags = Flags::None, @payload : Bytes? = nil, size : Int32? = nil)
       @size = size.try(&.to_i32)
     end
 
-    # The frame's payload size.
     def size
       @size || payload?.try(&.size) || 0
     end

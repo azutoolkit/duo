@@ -41,18 +41,11 @@ module Duo
 
     private def handle_connection
       loop do
-        unless frame = @connection.call
-          next
-        end
+        next unless frame = @connection.call
+
         case frame.type
-        when FrameType::Headers
-          @requests[frame.stream].send(nil)
-        when FrameType::PushPromise
-          # TODO: got SERVER PUSHed headers
-        when FrameType::GoAway
-          break
-        else
-          # shut up, crystal
+        when FrameType::Headers then @requests[frame.stream].send(nil)
+        when FrameType::GoAway  then break
         end
       end
     end

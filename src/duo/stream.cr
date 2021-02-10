@@ -6,7 +6,7 @@ require "./priority"
 module Duo
   class Stream
     getter id : Int32
-    getter state : State
+    property state : State
     property priority : Priority
 
     getter max_frame_size : Int32
@@ -21,9 +21,6 @@ module Duo
       @max_frame_size = remote_settings.max_frame_size
       @remote_window_size = remote_settings.initial_window_size
       @local_window_size = local_settings.initial_window_size
-    end
-
-    def state=(@state)
     end
 
     def zero?
@@ -58,26 +55,23 @@ module Duo
       false
     end
 
+    def wait_writeable
+      @fiber = Fiber.current
+      Crystal::Scheduler.reschedule
+    ensure
+      @fiber = nil
+    end
+
+    def resume_writeable
+      if (fiber = @fiber) && remote_window_size > 0
+        Crystal::Scheduler.enqueue(Fiber.current)
+        fiber.resume
+      end
+    end
+
     def process_window_update(size) : Nil
       return conn_window_update(size) if id.zero?
       window_update(size)
-    end
-
-    def conn_window_update(size)
-      raise Error.flow_control_error if (remote_window_size.to_i64 + size) > MAXIMUM_WINDOW_SIZE
-      remote_window_size + size
-      if remote_window_size > 0
-        streams.each(&.resume_writeable)
-      end
-    end
-
-    def window_update(size)
-      if (remote_window_size.to_i64 + size) > MAXIMUM_WINDOW_SIZE
-        send_rst_stream(Error::Code::FlowControlError)
-        return
-      end
-      @remote_window_size += size
-      resume_writeable
     end
 
     def send_rst_stream(error_code : Error::Code) : Nil
@@ -176,7 +170,24 @@ module Duo
       end
     end
 
-    def consume_remote_window_size(size)
+    private def conn_window_update(size)
+      raise Error.flow_control_error if (remote_window_size.to_i64 + size) > MAXIMUM_WINDOW_SIZE
+      remote_window_size + size
+      if remote_window_size > 0
+        streams.each(&.resume_writeable)
+      end
+    end
+
+    private def window_update(size)
+      if (remote_window_size.to_i64 + size) > MAXIMUM_WINDOW_SIZE
+        send_rst_stream(Error::Code::FlowControlError)
+        return
+      end
+      @remote_window_size += size
+      resume_writeable
+    end
+
+    private def consume_remote_window_size(size)
       loop do
         window_size = remote_window_size
         return 0 if window_size == 0
@@ -186,20 +197,6 @@ module Duo
           remote_window_size = window_size - actual
         end
         return actual
-      end
-    end
-
-    private def wait_writeable
-      @fiber = Fiber.current
-      Crystal::Scheduler.reschedule
-    ensure
-      @fiber = nil
-    end
-
-    def resume_writeable
-      if (fiber = @fiber) && remote_window_size > 0
-        Crystal::Scheduler.enqueue(Fiber.current)
-        fiber.resume
       end
     end
   end

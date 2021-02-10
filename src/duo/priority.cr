@@ -7,7 +7,6 @@ module Duo
     def initialize(@exclusive : Bool, @dep_stream_id : Int32, @weight : Int32)
     end
 
-    # :nodoc:
     def debug
       "exclusive=#{exclusive} dep_stream_id=#{dep_stream_id} weight=#{weight}"
     end
