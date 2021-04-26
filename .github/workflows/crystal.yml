@@ -21,6 +21,6 @@ jobs:
     - name: Build Duo Server
       run:  shards build server
     - name: Run Server
-      run: ./bin/server
+      run: ./bin/server .&
     - name: Run H2 Spec
       run: h2spec -p 9876 -k -t -S
