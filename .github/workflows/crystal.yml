@@ -18,9 +18,9 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install dependencies
       run: shards install
-    - name: Run HTTP2 Server
-      run: crystal ./examples/server.cr .&
-    - name: Wait for server to be up
-      run: sleep 20
+    - name: Build Duo Server
+      run:  shards build server
+    - name: Run Server
+      run: ./bin/server
     - name: Run H2 Spec
       run: h2spec -p 9876 -k -t -S
