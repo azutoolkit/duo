@@ -1,5 +1,7 @@
 # DUO
 
+[![Crystal CI](https://github.com/azutoolkit/duo/actions/workflows/crystal.yml/badge.svg?branch=main)](https://github.com/azutoolkit/duo/actions/workflows/crystal.yml)
+
 An HTTP/2 Server written purely in Crystal
 
 HTTP/2 is binary, instead of textual. HTTP/2 is fully multiplexed. This means that HTTP/2 can send multiple requests for data in parallel over a single TCP connection. This is the most advanced feature of the HTTP/2 protocol because it allows you to download web files via ASync mode from one server.
