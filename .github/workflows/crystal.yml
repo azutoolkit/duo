@@ -24,3 +24,7 @@ jobs:
       run: ./bin/server .&
     - name: Run H2 Spec
       run: h2spec -p 9876 -k -t -S
+    - name: Run H2 Load
+      run: h2load -n 100000 -c 100 -t 1 -T 2 -m 32 -H https://127.0.0.1:9876
+
+
