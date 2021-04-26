@@ -110,7 +110,7 @@ module Duo
       end
     end
 
-    def self.client_preface(io, truncated = false)
+    def read_client_preface(truncated = false)
       raise "can't read HTTP/2 client preface on a client connection" unless @type.server?
       if truncated
         buf1 = uninitialized UInt8[8]
