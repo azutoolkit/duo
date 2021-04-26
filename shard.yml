@@ -6,4 +6,6 @@ license: MIT
 authors:
   - Elias J. Perez <eliasjpr@gmail.com>
 
-
+targets:
+  server:
+    main: ./examples/server.cr
