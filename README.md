@@ -1,4 +1,4 @@
-<div style="text-align:center"><img src="./duo2.png" /></div>
+<div style="text-align:center"><img src="https://raw.githubusercontent.com/azutoolkit/duo/main/duo2.png" /></div>
 
 # DUO
 
