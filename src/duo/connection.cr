@@ -402,6 +402,7 @@ module Duo
       frame.payload = Bytes.new(frame.size)
       io.read(frame.payload)
     end
+
     private def write(frame : Frame, flush = true)
       size = frame.payload?.try(&.size.to_u32) || 0_u32
       stream = frame.stream
