@@ -140,7 +140,7 @@ module Duo
       connection = Connection.new(io, Connection::Type::Server)
 
       if settings
-        connection.remote_settings.parse(settings) do |setting, value|
+        connection.remote_settings.parse(settings) do |_, value|
         end
       end
 

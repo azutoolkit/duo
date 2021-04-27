@@ -2,7 +2,7 @@
 
 # DUO
 
-[![Crystal CI](https://github.com/azutoolkit/duo/actions/workflows/crystal.yml/badge.svg?branch=main)](https://github.com/azutoolkit/duo/actions/workflows/crystal.yml)
+[![Crystal CI](https://github.com/azutoolkit/duo/actions/workflows/crystal.yml/badge.svg?branch=main)](https://github.com/azutoolkit/duo/actions/workflows/crystal.yml) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/3b282e9b818c4efdb7b0ba94b62a262f)](https://www.codacy.com/gh/azutoolkit/duo/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=azutoolkit/duo&amp;utm_campaign=Badge_Grade)
 
 An HTTP/2 Server written purely in Crystal
 
@@ -143,16 +143,14 @@ end
 client.close
 ```
 
-## Development
-
-TODO: Write development instructions here
-
 ## Credits
 
 - Julien Portalier [@ysbaddaden](https://github.com/ysbaddaden)
 - [@636f7374](https://github.com/636f7374) 
 
 ## Contributing
+
+Contributing to Duo can be a rewarding way to learn, teach, and build experience in just about any skill you can imagine. You don’t have to become a lifelong contributor to enjoy participating in Duo.
 
 1. Fork it (<https://github.com/azutoolkit/duo/fork>)
 2. Create your feature branch (`git checkout -b my-new-feature`)

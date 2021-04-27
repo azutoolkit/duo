@@ -4,7 +4,6 @@ class EchoHandler
   include Duo::Server::Handler
 
   def call(context : Duo::Server::Context)
-    request, response = context.request, context.response
     context.response << "Hello World!"
     context
   end

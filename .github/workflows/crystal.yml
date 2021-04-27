@@ -19,7 +19,7 @@ jobs:
     - name: Install dependencies
       run: shards install
     - name: Build Duo Server
-      run:  shards build server
+      run:  shards build --production server
     - name: Run Server
       run: ./bin/server .&
     - name: Run H2 Spec

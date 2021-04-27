@@ -194,7 +194,7 @@ module Duo
 
         actual = Math.min(size, window_size)
         if remote_window_size != window_size
-          remote_window_size = window_size - actual
+          @remote_window_size = window_size - actual
         end
         return actual
       end

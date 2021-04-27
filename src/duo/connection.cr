@@ -60,8 +60,6 @@ module Duo
 
     def call
       frame = read_frame_header
-      stream = frame.stream
-
       State.receiving(frame)
 
       case frame.type
@@ -337,7 +335,7 @@ module Duo
     private def read_rst_stream_frame(frame)
       raise Error.protocol_error if frame.stream.zero?
       raise Error.frame_size_error unless frame.size == RST_STREAM_FRAME_SIZE
-      error_code = Error::Code.new(io.read_bytes(UInt32, IO::ByteFormat::BigEndian))
+      Error::Code.new(io.read_bytes(UInt32, IO::ByteFormat::BigEndian))
     end
 
     private def read_settings_frame(frame)
