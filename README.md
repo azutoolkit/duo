@@ -52,7 +52,7 @@ req/s           :      71.88       72.18       72.00        0.11    68.00%
    ```yaml
    dependencies:
      duo:
-       github: eliasjpr/duo
+       github: azutoolkit/duo
    ```
 
 2. Run `shards install`
@@ -66,7 +66,7 @@ require "duo"
 ## Server Example
 
 ```crystal
-require "../src/duo"
+require "duo"
 
 class EchoHandler
   include Duo::Server::Handler
@@ -118,7 +118,7 @@ server.listen(handlers)
 ```crystal
 require "socket"
 require "openssl"
-require "./src/connection"
+require "duo/connection"
 
 Log.for("Duo(Duo)").level = Log::Severity::Debug
 
@@ -154,7 +154,7 @@ TODO: Write development instructions here
 
 ## Contributing
 
-1. Fork it (<https://github.com/eliasjpr/duo/fork>)
+1. Fork it (<https://github.com/azutoolkit/duo/fork>)
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
