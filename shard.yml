@@ -1,6 +1,6 @@
 
 crystal: ">=0.36.0"
-name: Duo
+name: duo
 version: 0.1.0
 license: MIT
 authors:
