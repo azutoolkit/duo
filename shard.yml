@@ -1,7 +1,7 @@
 
 crystal: ">=0.36.0"
 name: duo
-version: 0.1.0
+version: 0.1.1
 license: MIT
 authors:
   - Elias J. Perez <eliasjpr@gmail.com>
