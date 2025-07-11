@@ -18,7 +18,7 @@ module Duo
       MaxFrameSize         = 0x5
       MaxHeaderListSize    = 0x6
 
-      def self.parse(io : IO, size : Int32, settings) : Nil
+      def self.parse(io : IO, size : Int32, settings, &) : Nil
         size.times do |_|
           id = from_value?(io.read_bytes(UInt16, IO::ByteFormat::BigEndian))
           raw_value = io.read_bytes(UInt32, IO::ByteFormat::BigEndian)
@@ -63,17 +63,17 @@ module Duo
       @max_concurrent_streams : Int32 = MAX_CONCURRENT_STREAMS,
       @initial_window_size : Int32 = DEFAULT_INITIAL_WINDOW_SIZE,
       @max_frame_size : Int32 = DEFAULT_MAX_FRAME_SIZE,
-      @max_header_list_size : Int32 = MAX_HEADER_LIST_SIZE
+      @max_header_list_size : Int32 = MAX_HEADER_LIST_SIZE,
     )
     end
 
-    def parse(bytes : Bytes) : Nil
+    def parse(bytes : Bytes, &) : Nil
       Identifier.parse(IO::Memory.new(bytes), bytes.size // 6, self) do |identifier, value|
         yield identifier, value
       end
     end
 
-    def parse(io : IO, size : Int32) : Nil
+    def parse(io : IO, size : Int32, &) : Nil
       Identifier.parse(io, size, self) do |identifier, value|
         yield identifier, value
       end

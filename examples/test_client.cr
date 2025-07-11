@@ -19,7 +19,7 @@ headers = HTTP::Headers{
   ":method"    => "GET",
   ":path"      => "/echo",
   "user-agent" => "duo-test-client/1.0",
-  "x-test"     => "echo-test"
+  "x-test"     => "echo-test",
 }
 
 client.request(headers) do |response_headers, body|
@@ -34,7 +34,7 @@ puts "\n📡 Test 2: JSON API endpoints"
 # Test /api/users
 headers = HTTP::Headers{
   ":method" => "GET",
-  ":path"   => "/api/users"
+  ":path"   => "/api/users",
 }
 
 client.request(headers) do |response_headers, body|
@@ -45,7 +45,7 @@ end
 # Test /api/status
 headers = HTTP::Headers{
   ":method" => "GET",
-  ":path"   => "/api/status"
+  ":path"   => "/api/status",
 }
 
 client.request(headers) do |response_headers, body|
@@ -59,7 +59,7 @@ puts "\n📡 Test 3: File serving endpoints"
 # Test HTML file
 headers = HTTP::Headers{
   ":method" => "GET",
-  ":path"   => "/files/html"
+  ":path"   => "/files/html",
 }
 
 client.request(headers) do |response_headers, body|
@@ -75,7 +75,7 @@ error_codes = [400, 401, 403, 404, 500, 503]
 error_codes.each do |code|
   headers = HTTP::Headers{
     ":method" => "GET",
-    ":path"   => "/error/#{code}"
+    ":path"   => "/error/#{code}",
   }
 
   client.request(headers) do |response_headers, body|
@@ -91,7 +91,7 @@ perf_endpoints = ["small", "medium", "large", "binary"]
 perf_endpoints.each do |endpoint|
   headers = HTTP::Headers{
     ":method" => "GET",
-    ":path"   => "/perf/#{endpoint}"
+    ":path"   => "/perf/#{endpoint}",
   }
 
   client.request(headers) do |response_headers, body|
@@ -107,9 +107,9 @@ requests = [] of Fiber
 5.times do |i|
   requests << spawn do
     headers = HTTP::Headers{
-      ":method" => "GET",
-      ":path"   => "/echo",
-      "x-request-id" => "req-#{i}"
+      ":method"      => "GET",
+      ":path"        => "/echo",
+      "x-request-id" => "req-#{i}",
     }
 
     client.request(headers) do |response_headers, body|

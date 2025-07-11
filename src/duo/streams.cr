@@ -31,7 +31,7 @@ module Duo
       end
     end
 
-    protected def each
+    protected def each(&)
       @mutex.synchronize do
         @streams.each { |_, stream| yield stream }
       end

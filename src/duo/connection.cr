@@ -61,18 +61,18 @@ module Duo
     def call
       begin
         frame, raw_type = read_frame_header
-        State.receiving(frame) unless raw_type > 9  # Don't transition state for unknown frames
+        State.receiving(frame) unless raw_type > 9 # Don't transition state for unknown frames
 
         case raw_type
-        when 0  then read_data_frame(frame)
-        when 1  then read_headers_frame(frame)
-        when 2  then read_priority_frame(frame)
-        when 3  then read_rst_stream_frame(frame)
-        when 4  then read_settings_frame(frame)
-        when 5  then read_push_promise_frame(frame)
-        when 6  then read_ping_frame(frame)
-        when 7  then read_goaway_frame(frame)
-        when 8  then read_window_update_frame(frame)
+        when 0 then read_data_frame(frame)
+        when 1 then read_headers_frame(frame)
+        when 2 then read_priority_frame(frame)
+        when 3 then read_rst_stream_frame(frame)
+        when 4 then read_settings_frame(frame)
+        when 5 then read_push_promise_frame(frame)
+        when 6 then read_ping_frame(frame)
+        when 7 then read_goaway_frame(frame)
+        when 8 then read_window_update_frame(frame)
         when 9
           raise Error.protocol_error("UNEXPECTED Continuation frame")
         else
@@ -164,7 +164,7 @@ module Duo
       end
     end
 
-    private def read_padded(frame)
+    private def read_padded(frame, &)
       size = frame.size
 
       if frame.flags.padded?
@@ -335,7 +335,7 @@ module Duo
         break if frame.flags.end_headers?
 
         frame, raw_type = read_frame_header
-        unless raw_type == 9  # Continuation frame
+        unless raw_type == 9 # Continuation frame
           raise Error.protocol_error("EXPECTED continuation frame")
         end
         unless frame.stream == stream

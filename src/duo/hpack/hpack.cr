@@ -6,7 +6,7 @@ require "./slice_reader"
 
 module HTTP
   struct Headers
-    def each_key
+    def each_key(&)
       @hash.each_key { |key| yield key.name }
     end
   end

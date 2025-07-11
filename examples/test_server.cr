@@ -576,14 +576,14 @@ ssl_context = create_ssl_context
 
 # Handler Chain - Order matters! Each handler should call_next() if it doesn't handle the request
 handlers = [
-  EchoHandler.new,           # Handle / and /echo
-  HealthHandler.new,         # Handle /health
-  JsonApiHandler.new,        # Handle /api/*
-  StreamingHandler.new,      # Handle /stream/*
-  FileHandler.new,           # Handle /files/*
-  ErrorHandler.new,          # Handle /error/*
-  PerformanceHandler.new,    # Handle /perf/*
-  NotFoundHandler.new,       # Handle everything else (404) - MUST be last
+  EchoHandler.new,        # Handle / and /echo
+  HealthHandler.new,      # Handle /health
+  JsonApiHandler.new,     # Handle /api/*
+  StreamingHandler.new,   # Handle /stream/*
+  FileHandler.new,        # Handle /files/*
+  ErrorHandler.new,       # Handle /error/*
+  PerformanceHandler.new, # Handle /perf/*
+  NotFoundHandler.new,    # Handle everything else (404) - MUST be last
 ]
 
 # Create and start server

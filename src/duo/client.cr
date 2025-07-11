@@ -50,7 +50,7 @@ module Duo
       end
     end
 
-    def request(headers : HTTP::Headers)
+    def request(headers : HTTP::Headers, &)
       headers[":authority"] = @authority
       headers[":scheme"] ||= @scheme
 
