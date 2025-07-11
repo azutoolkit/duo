@@ -8,7 +8,7 @@
 [![Crystal CI](https://github.com/azutoolkit/duo/actions/workflows/crystal.yml/badge.svg)](https://github.com/azutoolkit/duo/actions/workflows/crystal.yml)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/3b282e9b818c4efdb7b0ba94b62a262f)](https://www.codacy.com/gh/azutoolkit/duo/dashboard?utm_source=github.com&utm_medium=referral&utm_content=azutoolkit/duo&utm_campaign=Badge_Grade)
 [![H2Spec Compliant](https://img.shields.io/badge/H2Spec-146%2F146%20✅-brightgreen)](https://github.com/summerwind/h2spec)
-[![Performance](https://img.shields.io/badge/Performance-7K%2B%20req%2Fs-blue)](https://github.com/azutoolkit/duo)
+[![Performance](https://img.shields.io/badge/Performance-10.9K%20burst%2C%203.6K%20sustained-blue)](https://github.com/azutoolkit/duo)
 
 </div>
 
@@ -19,7 +19,7 @@ Duo is not just another HTTP server—it's a **fully compliant HTTP/2 implementa
 ### ✨ Key Features
 
 - 🔥 **Full HTTP/2 Compliance** - Passes all 146 H2Spec tests
-- ⚡ **High Performance** - 7,000+ requests/second with multiplexing
+- ⚡ **High Performance** - 10,900+ req/s burst, 3,600+ req/s sustained with multiplexing
 - 🔒 **TLS by Default** - Built-in SSL/TLS support with ALPN
 - 🧩 **Modular Design** - Clean handler-based architecture
 - 📦 **Zero Dependencies** - Pure Crystal implementation
@@ -96,13 +96,31 @@ Hypertext Transfer Protocol Version 2 (HTTP/2)
 
 ### Performance Benchmarks 🏆
 
-```bash
-h2load -n 100000 -c 100 -m 32 https://127.0.0.1:9876/
+#### Burst Performance (100K requests, 1K concurrent)
 
-finished in 13.91s, 7187.18 req/s, 407.42KB/s
-requests: 100000 total, 100000 succeeded
+```bash
+h2load -n 100000 -c 1000 -m 10 https://localhost:9876/health
+
+finished in 9.17s, 10900.91 req/s, 2.53MB/s
+requests: 100000 total, 100000 succeeded, 0 failed
 status codes: 100000 2xx
-traffic: 5.54MB total, headers savings: 76.92%
+traffic: 23.24MB total, headers savings: 49.48%
+```
+
+#### Sustained Performance (1M requests, 100 concurrent)
+
+```bash
+h2load -n 1000000 -c 100 -m 10 https://localhost:9876/health
+
+finished in 276.76s, 3613.26 req/s, 864.46KB/s
+requests: 1000000 total, 1000000 succeeded, 0 failed
+status codes: 1000000 2xx
+traffic: 233.64MB total, headers savings: 48.89%
+
+# Detailed metrics
+time for request:    33.22ms - 80.44s (mean: 276.68ms)
+time for connect:     8.40ms - 74.37ms (mean: 41.55ms)
+time to 1st byte:    90.98ms - 118.22ms (mean: 101.57ms)
 ```
 
 ## 🎯 Real-World Examples
