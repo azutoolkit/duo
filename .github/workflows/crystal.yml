@@ -28,8 +28,6 @@ jobs:
       - name: Check formatting
         run: crystal tool format --check ./src
       - name: Run tests
-        env:
-          DATABASE_URL: postgres://example:example@postgres:5432/example
         run: crystal spec
       - name: Install h2spec
         run: |
