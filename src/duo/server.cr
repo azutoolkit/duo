@@ -183,9 +183,15 @@ module Duo
         end
       end
     rescue ex : Duo::ClientError
-      Log.error(exception: ex) { "RECV: #{ex.code}: #{ex.message}" }
+      if ex.code == Duo::Error::Code::NoError
+        Log.info { "Connection closed cleanly (GOAWAY): #{ex.message}" }
+      else
+        Log.warn(exception: ex) { "Protocol error (GOAWAY): #{ex.code}: #{ex.message}" }
+      end
     rescue ex : Duo::Error
-      connection.close(error: ex) if connection
+      if connection && !connection.closed?
+        connection.close(error: ex)
+      end
     rescue ex : OpenSSL::SSL::Error
       Log.debug { "SSL Error (expected when client disconnects): #{ex.message}" }
     rescue ex : IO::EOFError

@@ -171,7 +171,12 @@ module Duo
     end
 
     private def conn_window_update(size)
-      raise Error.flow_control_error if (remote_window_size.to_i64 + size) > MAXIMUM_WINDOW_SIZE
+      new_window_size = remote_window_size.to_i64 + size
+      if new_window_size > MAXIMUM_WINDOW_SIZE
+        # Connection-level flow control error - must close connection with GOAWAY
+        close(error: Error.flow_control_error("Connection window size #{new_window_size} exceeds maximum #{MAXIMUM_WINDOW_SIZE}"))
+        return
+      end
       @remote_window_size += size
       if remote_window_size > 0
         streams.each(&.resume_writeable)
@@ -179,7 +184,9 @@ module Duo
     end
 
     private def window_update(size)
-      if (remote_window_size.to_i64 + size) > MAXIMUM_WINDOW_SIZE
+      new_window_size = remote_window_size.to_i64 + size
+      if new_window_size > MAXIMUM_WINDOW_SIZE
+        # Stream-level flow control error - send RST_STREAM and return
         send_rst_stream(Error::Code::FlowControlError)
         return
       end

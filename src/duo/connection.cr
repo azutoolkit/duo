@@ -442,11 +442,44 @@ module Duo
         if frame.stream.zero?
           raise Error.protocol_error("WINDOW_UPDATE with 0 increment on connection")
         else
-          raise Error.protocol_error("WINDOW_UPDATE with 0 increment on stream")
+          # Send RST_STREAM for stream-level errors
+          frame.stream.send_rst_stream(Error::Code::ProtocolError)
+          return
         end
       end
 
       raise Error.protocol_error unless MINIMUM_WINDOW_SIZE <= window_size_increment <= MAXIMUM_WINDOW_SIZE
+
+      # Check for flow control window overflow before processing
+      if frame.stream.zero?
+        # Connection-level window update
+        current_window = streams.find(0).remote_window_size
+        if current_window.to_i64 + window_size_increment > MAXIMUM_WINDOW_SIZE
+          # RFC 7540: Must send GOAWAY with FLOW_CONTROL_ERROR before closing
+          # Send the GOAWAY frame directly to ensure it's sent before closing
+          message = "Connection flow control window overflow"
+          payload = IO::Memory.new(8 + message.bytesize)
+          payload.write_bytes(streams.last_stream_id.to_u32, IO::ByteFormat::BigEndian)
+          payload.write_bytes(Error::Code::FlowControlError.to_u32, IO::ByteFormat::BigEndian)
+          payload << message
+
+          goaway_frame = Frame.new(FrameType::GoAway, streams.find(0), payload: payload.to_slice)
+          write(goaway_frame, flush: true)
+
+          # Close the connection after sending GOAWAY
+          close(notify: false)
+          return
+        end
+      else
+        # Stream-level window update - check overflow
+        current_window = frame.stream.remote_window_size
+        if current_window.to_i64 + window_size_increment > MAXIMUM_WINDOW_SIZE
+          # RFC 7540: Must send RST_STREAM with FLOW_CONTROL_ERROR
+          frame.stream.send_rst_stream(Error::Code::FlowControlError)
+          return
+        end
+      end
+
       stream.process_window_update(window_size_increment)
     end
 
@@ -497,7 +530,17 @@ module Duo
             payload.write_bytes(streams.last_stream_id.to_u32, IO::ByteFormat::BigEndian)
             payload.write_bytes(code.to_u32, IO::ByteFormat::BigEndian)
             payload << message
-            send Frame.new(FrameType::GoAway, streams.find(0), payload: payload.to_slice)
+
+            # Send GOAWAY frame through the channel
+            goaway_frame = Frame.new(FrameType::GoAway, streams.find(0), payload: payload.to_slice)
+            send(goaway_frame)
+
+            # Give a small delay to ensure the frame is processed, but don't block the main thread
+            spawn do
+              sleep 10.milliseconds
+              close_channel!
+            end
+            return
           end
         end
       rescue ex : OpenSSL::SSL::Error

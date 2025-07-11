@@ -21,7 +21,18 @@ module Duo
       def self.parse(io : IO, size : Int32, settings) : Nil
         size.times do |_|
           id = from_value?(io.read_bytes(UInt16, IO::ByteFormat::BigEndian))
-          value = io.read_bytes(UInt32, IO::ByteFormat::BigEndian).to_i32
+          raw_value = io.read_bytes(UInt32, IO::ByteFormat::BigEndian)
+
+          # Check for arithmetic overflow before converting to Int32
+          if raw_value > Int32::MAX.to_u32
+            # For settings that should be positive, this is an error
+            case id
+            when InitialWindowSize, MaxFrameSize, HeaderTableSize, MaxHeaderListSize, MaxConcurrentStreams
+              raise Error.protocol_error("Setting value #{raw_value} exceeds maximum allowed value")
+            end
+          end
+
+          value = raw_value.to_i32
           next unless id # unknown setting identifier
           yield id, value
 
