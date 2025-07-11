@@ -30,11 +30,19 @@ module Duo
       must_close = true
 
       if ssl_context = @ssl_context
-        io = OpenSSL::SSL::Socket::Server.new(io, ssl_context)
+        begin
+          io = OpenSSL::SSL::Socket::Server.new(io, ssl_context)
 
-        if io.alpn_protocol == "h2"
-          must_close = false
-          return handle_http2_connection(io, alpn: "h2")
+          if io.alpn_protocol == "h2"
+            must_close = false
+            return handle_http2_connection(io, alpn: "h2")
+          end
+        rescue ex : OpenSSL::SSL::Error
+          Log.debug { "SSL handshake error (client disconnect): #{ex.message}" }
+          return
+        rescue ex : IO::Error
+          Log.debug { "IO error during SSL handshake (client disconnect): #{ex.message}" }
+          return
         end
       end
 
@@ -160,9 +168,8 @@ module Duo
       end
 
       loop do
-        unless frame = connection.call
-          next
-        end
+        frame = connection.call
+        break unless frame
 
         case frame.type
         when FrameType::Headers
@@ -180,9 +187,11 @@ module Duo
     rescue ex : Duo::Error
       connection.close(error: ex) if connection
     rescue ex : OpenSSL::SSL::Error
-      Log.error(exception: ex) { "SSL Error: #{ex.message}" }
+      Log.debug { "SSL Error (expected when client disconnects): #{ex.message}" }
+    rescue ex : IO::EOFError
+      Log.debug { "Client disconnected (EOF): #{ex.message}" }
     rescue ex : IO::Error
-      Log.error(exception: ex) { "IO Error: #{ex.message}" }
+      Log.debug { "IO Error (expected when client disconnects): #{ex.message}" }
     ensure
       begin
         if connection && !connection.closed?

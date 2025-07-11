@@ -59,27 +59,41 @@ module Duo
     end
 
     def call
-      frame, raw_type = read_frame_header
-      State.receiving(frame) unless raw_type > 9  # Don't transition state for unknown frames
+      begin
+        frame, raw_type = read_frame_header
+        State.receiving(frame) unless raw_type > 9  # Don't transition state for unknown frames
 
-      case raw_type
-      when 0  then read_data_frame(frame)
-      when 1  then read_headers_frame(frame)
-      when 2  then read_priority_frame(frame)
-      when 3  then read_rst_stream_frame(frame)
-      when 4  then read_settings_frame(frame)
-      when 5  then read_push_promise_frame(frame)
-      when 6  then read_ping_frame(frame)
-      when 7  then read_goaway_frame(frame)
-      when 8  then read_window_update_frame(frame)
-      when 9
-        raise Error.protocol_error("UNEXPECTED Continuation frame")
-      else
-        # Unknown frame type - just read and discard
-        read_unsupported_frame(frame)
+        case raw_type
+        when 0  then read_data_frame(frame)
+        when 1  then read_headers_frame(frame)
+        when 2  then read_priority_frame(frame)
+        when 3  then read_rst_stream_frame(frame)
+        when 4  then read_settings_frame(frame)
+        when 5  then read_push_promise_frame(frame)
+        when 6  then read_ping_frame(frame)
+        when 7  then read_goaway_frame(frame)
+        when 8  then read_window_update_frame(frame)
+        when 9
+          raise Error.protocol_error("UNEXPECTED Continuation frame")
+        else
+          # Unknown frame type - just read and discard
+          read_unsupported_frame(frame)
+        end
+
+        frame
+      rescue ex : IO::EOFError
+        Log.debug { "Client disconnected (EOF): #{ex.message}" }
+        close(notify: false)
+        nil
+      rescue ex : OpenSSL::SSL::Error
+        Log.debug { "SSL error during call (ignored): #{ex.message}" }
+        close(notify: false)
+        nil
+      rescue ex : IO::Error
+        Log.debug { "IO error during call (ignored): #{ex.message}" }
+        close(notify: false)
+        nil
       end
-
-      frame
     end
 
     def write_client_preface
@@ -98,13 +112,37 @@ module Duo
           when Array(Frame) then frame.each { |f| write(f, flush: false) }
           when Frame        then write(frame, flush: false)
           else
-            io.close unless io.closed?
+            begin
+              io.close unless io.closed?
+            rescue ex : OpenSSL::SSL::Error
+              # Ignore SSL shutdown errors as they're common when clients disconnect abruptly
+              Log.debug { "SSL shutdown error in listen (ignored): #{ex.message}" }
+            rescue ex : IO::Error
+              # Ignore IO errors during close
+              Log.debug { "IO error during close in listen (ignored): #{ex.message}" }
+            end
             break
           end
         rescue Channel::ClosedError
           break
+        rescue ex : OpenSSL::SSL::Error
+          # Ignore SSL errors in the main listen loop
+          Log.debug { "SSL error in listen loop (ignored): #{ex.message}" }
+          break
+        rescue ex : IO::Error
+          # Ignore IO errors in the main listen loop
+          Log.debug { "IO error in listen loop (ignored): #{ex.message}" }
+          break
         ensure
-          io.flush if empty?
+          begin
+            io.flush if empty? && !io.closed?
+          rescue ex : OpenSSL::SSL::Error
+            # Ignore SSL errors during flush
+            Log.debug { "SSL error during flush (ignored): #{ex.message}" }
+          rescue ex : IO::Error
+            # Ignore IO errors during flush
+            Log.debug { "IO error during flush (ignored): #{ex.message}" }
+          end
         end
       end
     end
@@ -418,21 +456,31 @@ module Duo
     end
 
     private def write(frame : Frame, flush = true)
+      return if closed? || io.closed?
+
       size = frame.payload?.try(&.size.to_u32) || 0_u32
       stream = frame.stream
 
       State.sending(frame) unless frame.type.push_promise?
 
-      io.write_bytes((size << 8) | frame.type.to_u8, IO::ByteFormat::BigEndian)
-      io.write_byte(frame.flags.to_u8)
-      io.write_bytes(stream.id.to_u32, IO::ByteFormat::BigEndian)
+      begin
+        io.write_bytes((size << 8) | frame.type.to_u8, IO::ByteFormat::BigEndian)
+        io.write_byte(frame.flags.to_u8)
+        io.write_bytes(stream.id.to_u32, IO::ByteFormat::BigEndian)
 
-      if payload = frame.payload?
-        io.write(payload) if payload.size > 0
-      end
+        if payload = frame.payload?
+          io.write(payload) if payload.size > 0
+        end
 
-      if flush
-        io.flush
+        if flush
+          io.flush
+        end
+      rescue ex : OpenSSL::SSL::Error
+        Log.debug { "SSL error during write (ignored): #{ex.message}" }
+        close(notify: false)
+      rescue ex : IO::Error
+        Log.debug { "IO error during write (ignored): #{ex.message}" }
+        close(notify: false)
       end
     end
 
