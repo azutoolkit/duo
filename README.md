@@ -5,7 +5,7 @@
 
 **A high-performance, fully compliant HTTP/2 server written in Crystal**
 
-[![Crystal CI](https://github.com/azutoolkit/duo/actions/workflows/crystal.yml/badge.svg?branch=main)](https://github.com/azutoolkit/duo/actions/workflows/crystal.yml)
+[![Crystal CI](https://github.com/azutoolkit/duo/actions/workflows/crystal.yml/badge.svg)](https://github.com/azutoolkit/duo/actions/workflows/crystal.yml)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/3b282e9b818c4efdb7b0ba94b62a262f)](https://www.codacy.com/gh/azutoolkit/duo/dashboard?utm_source=github.com&utm_medium=referral&utm_content=azutoolkit/duo&utm_campaign=Badge_Grade)
 [![H2Spec Compliant](https://img.shields.io/badge/H2Spec-146%2F146%20✅-brightgreen)](https://github.com/summerwind/h2spec)
 [![Performance](https://img.shields.io/badge/Performance-7K%2B%20req%2Fs-blue)](https://github.com/azutoolkit/duo)
