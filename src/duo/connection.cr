@@ -59,41 +59,39 @@ module Duo
     end
 
     def call
-      begin
-        frame, raw_type = read_frame_header
-        State.receiving(frame) unless raw_type > 9 # Don't transition state for unknown frames
+      frame, raw_type = read_frame_header
+      State.receiving(frame) unless raw_type > 9 # Don't transition state for unknown frames
 
-        case raw_type
-        when 0 then read_data_frame(frame)
-        when 1 then read_headers_frame(frame)
-        when 2 then read_priority_frame(frame)
-        when 3 then read_rst_stream_frame(frame)
-        when 4 then read_settings_frame(frame)
-        when 5 then read_push_promise_frame(frame)
-        when 6 then read_ping_frame(frame)
-        when 7 then read_goaway_frame(frame)
-        when 8 then read_window_update_frame(frame)
-        when 9
-          raise Error.protocol_error("UNEXPECTED Continuation frame")
-        else
-          # Unknown frame type - just read and discard
-          read_unsupported_frame(frame)
-        end
-
-        frame
-      rescue ex : IO::EOFError
-        Log.debug { "Client disconnected (EOF): #{ex.message}" }
-        close(notify: false)
-        nil
-      rescue ex : OpenSSL::SSL::Error
-        Log.debug { "SSL error during call (ignored): #{ex.message}" }
-        close(notify: false)
-        nil
-      rescue ex : IO::Error
-        Log.debug { "IO error during call (ignored): #{ex.message}" }
-        close(notify: false)
-        nil
+      case raw_type
+      when 0 then read_data_frame(frame)
+      when 1 then read_headers_frame(frame)
+      when 2 then read_priority_frame(frame)
+      when 3 then read_rst_stream_frame(frame)
+      when 4 then read_settings_frame(frame)
+      when 5 then read_push_promise_frame(frame)
+      when 6 then read_ping_frame(frame)
+      when 7 then read_goaway_frame(frame)
+      when 8 then read_window_update_frame(frame)
+      when 9
+        raise Error.protocol_error("UNEXPECTED Continuation frame")
+      else
+        # Unknown frame type - just read and discard
+        read_unsupported_frame(frame)
       end
+
+      frame
+    rescue ex : IO::EOFError
+      Log.debug { "Client disconnected (EOF): #{ex.message}" }
+      close(notify: false)
+      nil
+    rescue ex : OpenSSL::SSL::Error
+      Log.debug { "SSL error during call (ignored): #{ex.message}" }
+      close(notify: false)
+      nil
+    rescue ex : IO::Error
+      Log.debug { "IO error during call (ignored): #{ex.message}" }
+      close(notify: false)
+      nil
     end
 
     def write_client_preface

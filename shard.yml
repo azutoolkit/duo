@@ -1,4 +1,3 @@
-
 crystal: ">=0.36.0"
 name: duo
 version: 0.1.1
@@ -9,3 +8,7 @@ authors:
 targets:
   server:
     main: ./examples/server.cr
+
+development_dependencies:
+  ameba:
+    github: crystal-ameba/ameba

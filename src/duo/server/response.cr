@@ -95,7 +95,7 @@ module Duo
         @stream.send_rst_stream(Duo::Error::Code::NoError)
       end
 
-      def upgrade(protocol : String, &block)
+      def upgrade(protocol : String, &_block)
         raise ArgumentError.new("Can't upgrade HTTP/2 connection")
       end
     end

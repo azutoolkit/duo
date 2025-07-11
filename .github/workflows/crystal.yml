@@ -2,30 +2,73 @@ name: Crystal CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [master]
   pull_request:
-    branches: [ main ]
-  schedule:
-    - cron: '0 12 * * *'
-    - cron: '0 8 * * *'
-    - cron: '0 20 * * *'
+    branches: [master]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     container:
-      image:  eliasjpr/http2-testing:latest
+      image: crystallang/crystal:1.16.3
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Install dependencies
-      run: shards install
-    - name: Build Duo Server
-      run:  shards build --production server
-    - name: Run Server
-      run: ./bin/server .&
-    - name: Run H2 Spec
-      run: h2spec -p 9876 -k -t -S
-
+      - uses: actions/checkout@v4
+      - name: Install shards
+        run: shards install --ignore-crystal-version
+      - name: Check formatting
+        run: crystal tool format --check ./src
+      - name: Run tests
+        env:
+          DATABASE_URL: postgres://example:example@postgres:5432/example
+        run: crystal spec
+  release:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    if: ${{ success() }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Compute Release Version
+        id: semver
+        uses: paulhatch/semantic-version@v4.0.2
+        with:
+          tag_prefix: "v"
+          major_pattern: "(MAJOR)"
+          minor_pattern: "(MINOR)"
+          # A string to determine the format of the version output
+          format: "${major}.${minor}.${patch}"
+          # If this is set to true, *every* commit will be treated as a new version.
+          bump_each_commit: true
+      - name: Bump Shard Version
+        id: bump-shard
+        uses: fjogeleit/yaml-update-action@master
+        with:
+          valueFile: shard.yml
+          propertyPath: version
+          value: ${{steps.semver.outputs.version}}
+          branch: master
+          updateFile: true
+          message: Set shard version ${{ steps.semver.outputs.version }}
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{steps.semver.outputs.version_tag}}
+          release_name: Release v${{steps.semver.outputs.version}}
+          draft: false
+          prerelease: false
