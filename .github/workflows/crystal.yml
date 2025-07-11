@@ -32,7 +32,7 @@ jobs:
 
       - name: Install h2spec
         run: |
-          wget -O h2spec https://github.com/summerwind/h2spec/releases/download/v2.6.0/h2spec_linux_amd64
+          curl -L -o h2spec https://github.com/summerwind/h2spec/releases/download/v2.6.0/h2spec_linux_amd64
           chmod +x h2spec
           mv h2spec /usr/local/bin/
 
