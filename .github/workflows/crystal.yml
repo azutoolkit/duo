@@ -1,4 +1,4 @@
-name: Crystal CI
+name: Duo Crystal CI
 
 on:
   push:
@@ -10,10 +10,6 @@ permissions:
   contents: write
   pages: write
   id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
 
 jobs:
   build:
