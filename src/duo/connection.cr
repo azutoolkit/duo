@@ -220,7 +220,7 @@ module Duo
 
       # For unknown frame types (> 9), use Data as placeholder
       frame_type = type <= 9 ? FrameType.new(type.to_i) : FrameType::Data
-      
+
       # PRIORITY frames can be sent on any stream ID, even non-existent ones
       # Unknown frames should also be allowed on any stream
       unless frame_type.priority? || type > 9 || streams.valid?(stream_id)
@@ -398,7 +398,7 @@ module Duo
       raise Error.frame_size_error unless frame.size == WINDOW_UPDATE_FRAME_SIZE
       buf = io.read_bytes(UInt32, IO::ByteFormat::BigEndian)
       window_size_increment = (buf & 0x7fffffff_u32).to_i32
-      
+
       # WINDOW_UPDATE with 0 increment is a protocol error
       if window_size_increment == 0
         if frame.stream.zero?
@@ -407,7 +407,7 @@ module Duo
           raise Error.protocol_error("WINDOW_UPDATE with 0 increment on stream")
         end
       end
-      
+
       raise Error.protocol_error unless MINIMUM_WINDOW_SIZE <= window_size_increment <= MAXIMUM_WINDOW_SIZE
       stream.process_window_update(window_size_increment)
     end
@@ -440,16 +440,24 @@ module Duo
       return if closed?
       @closed = true
 
-      unless io.closed?
-        if notify
-          message = error.message || ""
-          code = error.code
-          payload = IO::Memory.new(8 + message.bytesize)
-          payload.write_bytes(streams.last_stream_id.to_u32, IO::ByteFormat::BigEndian)
-          payload.write_bytes(code.to_u32, IO::ByteFormat::BigEndian)
-          payload << message
-          send Frame.new(FrameType::GoAway, streams.find(0), payload: payload.to_slice)
+      begin
+        unless io.closed?
+          if notify
+            message = error.message || ""
+            code = error.code
+            payload = IO::Memory.new(8 + message.bytesize)
+            payload.write_bytes(streams.last_stream_id.to_u32, IO::ByteFormat::BigEndian)
+            payload.write_bytes(code.to_u32, IO::ByteFormat::BigEndian)
+            payload << message
+            send Frame.new(FrameType::GoAway, streams.find(0), payload: payload.to_slice)
+          end
         end
+      rescue ex : OpenSSL::SSL::Error
+        # Ignore SSL errors during close as they're common when clients disconnect
+        Log.debug { "SSL error during close (ignored): #{ex.message}" }
+      rescue ex : IO::Error
+        # Ignore IO errors during close
+        Log.debug { "IO error during close (ignored): #{ex.message}" }
       end
 
       close_channel!

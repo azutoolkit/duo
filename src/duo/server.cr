@@ -91,7 +91,8 @@ module Duo
     ensure
       begin
         io.close if must_close
-      rescue IO::EOFError | IO::Error
+      rescue IO::EOFError | IO::Error | OpenSSL::SSL::Error
+        # Ignore connection close errors as they're common when clients disconnect
       end
     end
 
@@ -178,8 +179,22 @@ module Duo
       Log.error(exception: ex) { "RECV: #{ex.code}: #{ex.message}" }
     rescue ex : Duo::Error
       connection.close(error: ex) if connection
+    rescue ex : OpenSSL::SSL::Error
+      Log.error(exception: ex) { "SSL Error: #{ex.message}" }
+    rescue ex : IO::Error
+      Log.error(exception: ex) { "IO Error: #{ex.message}" }
     ensure
-      connection.close if connection
+      begin
+        if connection && !connection.closed?
+          connection.close
+        end
+      rescue ex : OpenSSL::SSL::Error
+        # Ignore SSL shutdown errors as they're common when clients disconnect abruptly
+        Log.debug { "SSL shutdown error (ignored): #{ex.message}" }
+      rescue ex : IO::Error
+        # Ignore IO errors during connection cleanup
+        Log.debug { "IO error during cleanup (ignored): #{ex.message}" }
+      end
     end
 
     private def context_for(stream : Stream, request = nil)
