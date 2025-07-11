@@ -59,22 +59,23 @@ module Duo
     end
 
     def call
-      frame = read_frame_header
-      State.receiving(frame)
+      frame, raw_type = read_frame_header
+      State.receiving(frame) unless raw_type > 9  # Don't transition state for unknown frames
 
-      case frame.type
-      when FrameType::Data         then read_data_frame(frame)
-      when FrameType::Headers      then read_headers_frame(frame)
-      when FrameType::PushPromise  then read_push_promise_frame(frame)
-      when FrameType::Priority     then read_priority_frame(frame)
-      when FrameType::RstStream    then read_rst_stream_frame(frame)
-      when FrameType::Settings     then read_settings_frame(frame)
-      when FrameType::Ping         then read_ping_frame(frame)
-      when FrameType::GoAway       then read_goaway_frame(frame)
-      when FrameType::WindowUpdate then read_window_update_frame(frame)
-      when FrameType::Continuation
+      case raw_type
+      when 0  then read_data_frame(frame)
+      when 1  then read_headers_frame(frame)
+      when 2  then read_priority_frame(frame)
+      when 3  then read_rst_stream_frame(frame)
+      when 4  then read_settings_frame(frame)
+      when 5  then read_push_promise_frame(frame)
+      when 6  then read_ping_frame(frame)
+      when 7  then read_goaway_frame(frame)
+      when 8  then read_window_update_frame(frame)
+      when 9
         raise Error.protocol_error("UNEXPECTED Continuation frame")
       else
+        # Unknown frame type - just read and discard
         read_unsupported_frame(frame)
       end
 
@@ -217,13 +218,18 @@ module Duo
         raise Error.frame_size_error
       end
 
-      frame_type = FrameType.new(type.to_i)
-      unless frame_type.priority? || streams.valid?(stream_id)
+      # For unknown frame types (> 9), use Data as placeholder
+      frame_type = type <= 9 ? FrameType.new(type.to_i) : FrameType::Data
+      
+      # PRIORITY frames can be sent on any stream ID, even non-existent ones
+      # Unknown frames should also be allowed on any stream
+      unless frame_type.priority? || type > 9 || streams.valid?(stream_id)
         raise Error.protocol_error("INVALID stream_id ##{stream_id}")
       end
 
-      stream = streams.find(stream_id, consume: !frame_type.priority?)
-      Frame.new(frame_type, stream, flags, size: size)
+      stream = streams.find(stream_id, consume: !frame_type.priority? && type <= 9)
+      frame = Frame.new(frame_type, stream, flags, size: size)
+      {frame, type}
     end
 
     private def validate_request_headers(headers : HTTP::Headers)
@@ -290,8 +296,8 @@ module Duo
       loop do
         break if frame.flags.end_headers?
 
-        frame = read_frame_header
-        unless frame.type.continuation?
+        frame, raw_type = read_frame_header
+        unless raw_type == 9  # Continuation frame
           raise Error.protocol_error("EXPECTED continuation frame")
         end
         unless frame.stream == stream
@@ -363,11 +369,11 @@ module Duo
     private def read_ping_frame(frame)
       raise Error.protocol_error unless frame.stream.zero?
       raise Error.frame_size_error unless frame.size == PING_FRAME_SIZE
-      buffer = uninitialized UInt8[8]
-      io.read_fully(buffer.to_slice)
+      buffer = Bytes.new(8)
+      io.read_fully(buffer)
 
       unless frame.flags.ack?
-        send Frame.new(FrameType::Ping, frame.stream, ACK, buffer.to_slice)
+        send Frame.new(FrameType::Ping, frame.stream, ACK, payload: buffer)
       end
     end
 
@@ -392,6 +398,16 @@ module Duo
       raise Error.frame_size_error unless frame.size == WINDOW_UPDATE_FRAME_SIZE
       buf = io.read_bytes(UInt32, IO::ByteFormat::BigEndian)
       window_size_increment = (buf & 0x7fffffff_u32).to_i32
+      
+      # WINDOW_UPDATE with 0 increment is a protocol error
+      if window_size_increment == 0
+        if frame.stream.zero?
+          raise Error.protocol_error("WINDOW_UPDATE with 0 increment on connection")
+        else
+          raise Error.protocol_error("WINDOW_UPDATE with 0 increment on stream")
+        end
+      end
+      
       raise Error.protocol_error unless MINIMUM_WINDOW_SIZE <= window_size_increment <= MAXIMUM_WINDOW_SIZE
       stream.process_window_update(window_size_increment)
     end

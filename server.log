@@ -1,0 +1,953 @@
+nohup: ignoring input
+listening on https://:::9876/
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b4e3cd80>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b4e3c900>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b4e3c6c0>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b4e3c5a0>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b4e3c480>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b4e3c360>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b4e3c240>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b4e3c120>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b4e3c000>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b09dfea0>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b09dfd80>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b09dfc60>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b09dfb40>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b09dfa20>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: SSL_shutdown: error:0A000123:SSL routines::application data after close notify (OpenSSL::SSL::Error)
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:179:11 in 'unbuffered_close'
+  from src/duo/connection.cr:101:13 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b09df480>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b09df360>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b09df240>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b09df120>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b09df000>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b4e3dea0>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b4e3dd80>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b4e3dc60>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b4e3db40>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b4e3da20>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b4e3d900>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b4e3d7e0>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b4e3d6c0>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b4e3d5a0>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b4e3d480>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b4e3d360>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b4e3d240>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b4e3d120>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b4e3d000>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b076fea0>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b076fd80>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b076fc60>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b076fb40>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: SSL_shutdown: error:0A000123:SSL routines::application data after close notify (OpenSSL::SSL::Error)
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:179:11 in 'unbuffered_close'
+  from src/duo/connection.cr:101:13 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: SSL_shutdown: error:0A000123:SSL routines::application data after close notify (OpenSSL::SSL::Error)
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:179:11 in 'unbuffered_close'
+  from src/duo/connection.cr:101:13 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: SSL_shutdown: error:0A000123:SSL routines::application data after close notify (OpenSSL::SSL::Error)
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:179:11 in 'unbuffered_close'
+  from src/duo/connection.cr:101:13 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: SSL_shutdown: error:0A000123:SSL routines::application data after close notify (OpenSSL::SSL::Error)
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:179:11 in 'unbuffered_close'
+  from src/duo/connection.cr:101:13 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: SSL_shutdown: error:0A000123:SSL routines::application data after close notify (OpenSSL::SSL::Error)
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:179:11 in 'unbuffered_close'
+  from src/duo/connection.cr:101:13 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: SSL_shutdown: error:0A000123:SSL routines::application data after close notify (OpenSSL::SSL::Error)
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:179:11 in 'unbuffered_close'
+  from src/duo/connection.cr:101:13 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: SSL_shutdown: error:0A000123:SSL routines::application data after close notify (OpenSSL::SSL::Error)
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:179:11 in 'unbuffered_close'
+  from src/duo/connection.cr:101:13 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: SSL_shutdown: error:0A000123:SSL routines::application data after close notify (OpenSSL::SSL::Error)
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:179:11 in 'unbuffered_close'
+  from src/duo/connection.cr:101:13 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: SSL_shutdown: error:0A000123:SSL routines::application data after close notify (OpenSSL::SSL::Error)
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:179:11 in 'unbuffered_close'
+  from src/duo/connection.cr:101:13 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: SSL_shutdown: error:0A000123:SSL routines::application data after close notify (OpenSSL::SSL::Error)
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:179:11 in 'unbuffered_close'
+  from src/duo/connection.cr:101:13 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: SSL_shutdown: error:0A000123:SSL routines::application data after close notify (OpenSSL::SSL::Error)
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:179:11 in 'unbuffered_close'
+  from src/duo/connection.cr:101:13 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: SSL_shutdown: error:0A000123:SSL routines::application data after close notify (OpenSSL::SSL::Error)
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:179:11 in 'unbuffered_close'
+  from src/duo/connection.cr:101:13 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: SSL_shutdown: error:0A000123:SSL routines::application data after close notify (OpenSSL::SSL::Error)
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:179:11 in 'unbuffered_close'
+  from src/duo/connection.cr:101:13 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: SSL_shutdown: error:0A000123:SSL routines::application data after close notify (OpenSSL::SSL::Error)
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:179:11 in 'unbuffered_close'
+  from src/duo/connection.cr:101:13 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: SSL_shutdown: error:0A000123:SSL routines::application data after close notify (OpenSSL::SSL::Error)
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:179:11 in 'unbuffered_close'
+  from src/duo/connection.cr:101:13 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: SSL_shutdown: error:0A000123:SSL routines::application data after close notify (OpenSSL::SSL::Error)
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:179:11 in 'unbuffered_close'
+  from src/duo/connection.cr:101:13 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: Arithmetic overflow (OverflowError)
+  from src/duo/connection.cr:79:9 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: SSL_shutdown: error:0A000123:SSL routines::application data after close notify (OpenSSL::SSL::Error)
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:179:11 in 'unbuffered_close'
+  from src/duo/connection.cr:101:13 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: SSL_shutdown: error:0A000123:SSL routines::application data after close notify (OpenSSL::SSL::Error)
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:179:11 in 'unbuffered_close'
+  from src/duo/connection.cr:101:13 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: SSL_shutdown: error:0A000123:SSL routines::application data after close notify (OpenSSL::SSL::Error)
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:179:11 in 'unbuffered_close'
+  from src/duo/connection.cr:101:13 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: SSL_shutdown: error:0A000123:SSL routines::application data after close notify (OpenSSL::SSL::Error)
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:179:11 in 'unbuffered_close'
+  from src/duo/connection.cr:101:13 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b08fab40>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: Arithmetic overflow (OverflowError)
+  from src/duo/connection.cr:79:9 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b08fa480>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: SSL_shutdown: error:0A000123:SSL routines::application data after close notify (OpenSSL::SSL::Error)
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:179:11 in 'unbuffered_close'
+  from src/duo/connection.cr:101:13 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: SSL_shutdown: error:0A000123:SSL routines::application data after close notify (OpenSSL::SSL::Error)
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:179:11 in 'unbuffered_close'
+  from src/duo/connection.cr:101:13 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+2025-07-10T21:10:44.930718Z  ERROR - Duo (Duo): RECV: 255: 
+ (Duo::ClientError)
+  from /usr/share/crystal/src/string.cr:224:31 in 'read_goaway_frame'
+  from src/duo/connection.cr:73:20 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+
+Unhandled exception in spawn: End of file reached (IO::EOFError)
+  from src/duo/connection.cr:218:15 in 'read_frame_header'
+  from src/duo/connection.cr:62:25 in 'call'
+  from src/duo/server.cr:163:11 in 'handle_socket'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???
+Unhandled exception in spawn: write (#<TCPSocket:0x7a09b34f26c0>): Connection reset by peer (IO::Error)
+  from /usr/share/crystal/src/crystal/event_loop/polling.cr:449:11 in 'unbuffered_write'
+  from /usr/share/crystal/src/openssl/bio.cr:31:7 in '->'
+  from /lib/x86_64-linux-gnu/libcrypto.so.3 in 'BIO_write'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in '??'
+  from /lib/x86_64-linux-gnu/libssl.so.3 in 'SSL_write'
+  from /usr/share/crystal/src/openssl/ssl/socket.cr:149:5 in '??'
+  from src/duo/connection.cr:107:11 in 'listen'
+  from /usr/share/crystal/src/fiber.cr:170:11 in 'run'
+  from ???

@@ -172,7 +172,7 @@ module Duo
 
     private def conn_window_update(size)
       raise Error.flow_control_error if (remote_window_size.to_i64 + size) > MAXIMUM_WINDOW_SIZE
-      remote_window_size + size
+      @remote_window_size += size
       if remote_window_size > 0
         streams.each(&.resume_writeable)
       end

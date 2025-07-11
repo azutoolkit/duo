@@ -33,6 +33,8 @@ module Duo
           stream.state = frame.flags.end_stream? ? HalfClosedRemote : Open
         when FrameType::PushPromise
           stream.state = receiving ? ReservedRemote : ReservedLocal
+        when FrameType::Priority
+          # PRIORITY frames are allowed on idle streams
         else
           error!(receiving)
         end
