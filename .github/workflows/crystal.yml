@@ -32,9 +32,11 @@ jobs:
 
       - name: Install h2spec
         run: |
-          curl -L -o h2spec https://github.com/summerwind/h2spec/releases/download/v2.6.0/h2spec_linux_amd64
+          curl -L -o h2spec.tar.gz https://github.com/summerwind/h2spec/releases/download/v2.6.0/h2spec_linux_amd64.tar.gz
+          tar -xzf h2spec.tar.gz
           chmod +x h2spec
           mv h2spec /usr/local/bin/
+          rm h2spec.tar.gz
 
       - name: Generate SSL certificates
         run: |
